@@ -57,7 +57,6 @@
 [data-theme="light"] body{background:var(--bg);color:var(--text)}
 [data-theme="light"] #nav{background:rgba(245,242,236,0.96);border-bottom-color:rgba(0,0,0,0.08)}
 [data-theme="light"] #particleCanvas{opacity:.08}
-[data-theme="light"] .plym-logo{filter:invert(1) brightness(0)}
 [data-theme="light"] .hero-letter{text-shadow:0 0 50px rgba(229,81,0,0.22)}
 [data-theme="light"] .btn-primary{color:#fff}
 [data-theme="light"] .blockquote{background:rgba(229,81,0,0.04);border-left-color:var(--ice)}
@@ -75,8 +74,6 @@
 [data-theme="light"] .outcome-banner.fragile{background:linear-gradient(135deg,#5a4000,#8a6200)}
 [data-theme="light"] .outcome-banner.serious{background:linear-gradient(135deg,#6a1010,#9a2020)}
 /* theme toggle button */
-.theme-toggle{background:none;border:1px solid var(--border-lt);border-radius:20px;padding:.28rem .65rem;font-size:.85rem;color:var(--text-sub);cursor:pointer;flex-shrink:0;transition:all .2s;line-height:1}
-.theme-toggle:hover{border-color:var(--ice);color:var(--ice)}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -447,7 +444,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <button class="nav-btn" data-page="scenario" onclick="navigate('scenario')">Scenario Experience</button>
     <button class="nav-btn" data-page="contact" onclick="navigate('contact')">Contact / Impact</button>
   </div>
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle light / dark">☀</button>
   <button class="nav-btn" onclick="toggleNotesPanel()" style="flex-shrink:0;border-color:var(--border-lt)">Notes</button>
   <button class="nav-burger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -498,7 +494,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <button class="btn btn-secondary" onclick="navigate('scenario')">Scenario Experience</button>
       </div>
       <div style="margin-top:1.25rem;opacity:0;animation:fadeUp .6s ease 1.1s both">
-        <img src="./plymouth-logo-white.png" alt="University of Plymouth" class="plym-logo">
+        <img src="./UoPLogo1.png" alt="University of Plymouth" class="plym-logo">
       </div>
     </div>
 
@@ -798,7 +794,7 @@ const SCENARIOS = [
   {
     title: "Final Push",
     bestOption: "B",
-    bestExplanation: "Option B captures additional value without ignoring the cost. A reduced final task with a strict time limit requires discipline, but it is the kind of structured decision that distinguishes experienced teams from those driven by momentum. The goal is not the most data — it is the most data the team can safely carry home.",
+    bestExplanation: "Option B captures additional value without ignoring the cost. A reduced final task with a strict time limit requires discipline, but it is the kind of structured decision that distinguishes experienced teams from those driven by momentum. The goal is not the most data: it is the most data the team can safely carry home.",
     narrative: "The team is close to achieving the mission aim. A final opportunity appears to collect additional high-value data, but conditions are worsening.",
     options: [
       { label:"A", text:"Stop at the agreed threshold and preserve the team for safe exit.", effect:{time:-1,safety:4,energy:2}, consequence:"You respect the plan and protect recovery." },
@@ -815,7 +811,7 @@ const SCENARIOS = [
 ═══════════════════════════════════════════════════════════ */
 function buildSlide(index) {
   const s = SLIDE_DATA[index];
-  let html = `<div class="slide-number">Slide ${index+1} of ${SLIDE_DATA.length} — ${s.section}</div>`;
+  let html = `<div class="slide-number">Slide ${index+1} of ${SLIDE_DATA.length}: ${s.section}</div>`;
   html += `<h2 class="slide-title">${s.title}</h2>`;
   html += `<div class="slide-body">${s.body}</div>`;
   if (s.cta) html += `<div class="slide-cta">${s.cta}</div>`;
@@ -828,7 +824,7 @@ const SLIDE_DATA = [
     body:`<div class="slide-quote">Turning research into teaching that students experience, not just study.</div>
     <p>The SPARC Framework for Scenario-Based Learning</p>
     <p>Welcome to a session that will model the framework as you experience it, not just describe it from the outside.</p>`,
-    note:"Welcome delegates. Explain that the session itself will model the framework — they are about to experience scenario-based learning, not just hear about it." },
+    note:"Welcome delegates. Explain that the session itself will model the framework: they are about to experience scenario-based learning, not just hear about it." },
 
   // 2
   { section:"The Problem", title:"The problem: research does not automatically become learning",
@@ -849,7 +845,7 @@ const SLIDE_DATA = [
     <div class="slide-mini">Reflection</div>
     </div>
     <p>This reframes research-led teaching as decision-led learning. The shift is small but the implications for design are significant.</p>`,
-    note:"This reframes research-led teaching as decision-led learning. Spend a moment on the three cards — they represent a shift in what counts as the core learning activity." },
+    note:"This reframes research-led teaching as decision-led learning. Spend a moment on the three cards: they represent a shift in what counts as the core learning activity." },
 
   // 4
   { section:"Introducing SPARC", title:"The SPARC Framework",
@@ -865,8 +861,9 @@ const SLIDE_DATA = [
     note:"Walk through each letter briefly. The point is not to memorise the acronym but to understand that each stage does different design work." },
 
   // 5
-  { section:"S: Scenario Learning", title:"S — Scenario Learning",
-    body:`<div class="slide-quote">Students engage with realistic situations that mirror the complexity, ambiguity, and pressure of practice.</div>
+  { section:"S: Scenario Learning", title:"S: Scenario Learning",
+    body:`<img src="./antarctic.jpg" alt="Antarctic field environment" class="slide-img" style="max-height:200px">
+    <div class="slide-quote">Students engage with realistic situations that mirror the complexity, ambiguity, and pressure of practice.</div>
     <ul class="slide-list">
     <li>Emergency planning and triage decisions</li>
     <li>Expedition logistics under constraint</li>
@@ -875,10 +872,10 @@ const SLIDE_DATA = [
     <li>Resource trade-offs in real time</li>
     </ul>
     <div class="slide-quote">What situation from your discipline contains genuine uncertainty or judgement?</div>`,
-    note:"This question is worth a brief pair discussion. Uncertainty and judgement are the key ingredients — if a scenario has a clear right answer it may not be doing much pedagogical work." },
+    note:"This question is worth a brief pair discussion. Uncertainty and judgement are the key ingredients: if a scenario has a clear right answer it may not be doing much pedagogical work." },
 
   // 6
-  { section:"P: Partnership", title:"P — Partnership",
+  { section:"P: Partnership", title:"P: Partnership",
     body:`<img src="./IMG_7295.jpg" alt="Field research and partnership" class="slide-img" style="max-height:180px">
     <div class="slide-quote">Partnerships provide the reality. They reveal the pressures, constraints, language, and consequences that make a learning activity authentic.</div>
     <ul class="slide-list">
@@ -892,7 +889,7 @@ const SLIDE_DATA = [
     note:"Reassure delegates that partnership does not mean formal co-authorship of every teaching activity. The partner provides the reality; the educator designs the learning." },
 
   // 7
-  { section:"A: Application", title:"A — Application",
+  { section:"A: Application", title:"A: Application",
     body:`<img src="./MOCAP.png" alt="Scenario learning in practice" class="slide-img" style="max-height:180px">
     <div class="slide-quote">Application means students use ideas, not just recall them.</div>
     <ul class="slide-list">
@@ -904,10 +901,10 @@ const SLIDE_DATA = [
     <li>Manage risk when consequences are visible</li>
     </ul>
     <div class="slide-quote">The strongest activities make students do the thinking that practitioners actually had to do.</div>`,
-    note:"The distinction between 'knowing about' and 'doing the thinking' is important here. Application is not just a task — it is the core learning mechanism." },
+    note:"The distinction between 'knowing about' and 'doing the thinking' is important here. Application is not just a task: it is the core learning mechanism." },
 
   // 8
-  { section:"R + C", title:"R + C — Reflection into Curriculum",
+  { section:"R + C", title:"R + C: Reflection into Curriculum",
     body:`<img src="./John_Diego.jpg" alt="Reflection and curriculum design" class="slide-img" style="max-height:180px">
     <p>Reflection turns activity into learning. Curriculum turns one good activity into a coherent teaching design.</p>
     <div class="slide-rc-grid">
@@ -952,15 +949,15 @@ const SLIDE_DATA = [
     <li>Collective risk awareness</li>
     </ul>
     <div class="slide-quote">How do we prepare interdisciplinary practitioners to work together on a difficult goal when conditions are uncertain and consequences matter?</div>`,
-    note:"This slide contextualises why the scenario involves an interdisciplinary team. The problems are not just technical — they are relational and communicative." },
+    note:"This slide contextualises why the scenario involves an interdisciplinary team. The problems are not just technical: they are relational and communicative." },
 
   // 11
   { section:"Resources", title:"Your resources",
     body:`<p>Three meters shape every decision your team makes:</p>
     <div class="slide-chips" style="margin:1.2rem 0">
-    <div class="slide-chip" style="border-color:var(--ice-dim);color:var(--ice)">⏱ Time — starts at 20</div>
-    <div class="slide-chip" style="border-color:var(--green-dim);color:var(--green)">🛡 Safety — starts at 20</div>
-    <div class="slide-chip" style="border-color:var(--amber-dim);color:var(--amber)">⚡ Energy — starts at 20</div>
+    <div class="slide-chip" style="border-color:var(--ice-dim);color:var(--ice)">⏱ Time: starts at 20</div>
+    <div class="slide-chip" style="border-color:var(--green-dim);color:var(--green)">🛡 Safety: starts at 20</div>
+    <div class="slide-chip" style="border-color:var(--amber-dim);color:var(--amber)">⚡ Energy: starts at 20</div>
     </div>
     <div class="slide-quote">Your goal is not to maximise one score. Your goal is to keep the mission viable. A team that rushes but exhausts everyone has not succeeded. A team that is safe but runs out of time has not succeeded either.</div>`,
     note:"Emphasise balance. Teams often optimise for one resource and neglect others. The post-scenario debrief is where you discuss what the pattern of choices reveals." },
@@ -968,7 +965,7 @@ const SLIDE_DATA = [
   // 12
   { section:"How It Works", title:"How the experience works",
     body:`<ul class="slide-list">
-    <li>Work as a team — discuss each scenario before choosing.</li>
+    <li>Work as a team: discuss each scenario before choosing.</li>
     <li>Read the scenario carefully.</li>
     <li>Choose one option from A, B, C, or D.</li>
     <li>Each choice affects Time, Safety, and Energy differently.</li>
@@ -987,7 +984,7 @@ const SLIDE_DATA = [
     <li>Did your decisions reflect your stated mission value?</li>
     <li>Did uncertainty produce better thinking or faster guessing?</li>
     </ul>`,
-    note:"These questions become the debrief. You do not need to answer them during the scenario — just hold them." },
+    note:"These questions become the debrief. You do not need to answer them during the scenario: just hold them." },
 
   // 14
   { section:"After the Mission", title:"After the mission",
@@ -1000,11 +997,11 @@ const SLIDE_DATA = [
   { section:"Post-Scenario", title:"What just happened?",
     body:`<p>You just experienced:</p>
     <ul class="slide-list">
-    <li>Uncertainty — the scenarios offered no clearly right answers.</li>
-    <li>Negotiation — decisions required discussion, not just knowledge.</li>
-    <li>Trade-offs — gaining one resource often cost another.</li>
-    <li>Consequences — choices had visible effects on the mission.</li>
-    <li>Material for reflection — you now have something concrete to examine.</li>
+    <li>Uncertainty: the scenarios offered no clearly right answers.</li>
+    <li>Negotiation: decisions required discussion, not just knowledge.</li>
+    <li>Trade-offs: gaining one resource often cost another.</li>
+    <li>Consequences: choices had visible effects on the mission.</li>
+    <li>Material for reflection: you now have something concrete to examine.</li>
     </ul>
     <p style="margin-top:1rem">Map that back to SPARC:</p>
     <div class="slide-chips">
@@ -1014,7 +1011,7 @@ const SLIDE_DATA = [
     <div class="slide-chip"><span class="n">R</span>Reflection</div>
     <div class="slide-chip"><span class="n">C</span>Curriculum</div>
     </div>`,
-    note:"This slide bridges the experience back to the framework. The point is that delegates have now lived through each stage — the framework is not abstract to them anymore." },
+    note:"This slide bridges the experience back to the framework. The point is that delegates have now lived through each stage: the framework is not abstract to them anymore." },
 
   // 16
   { section:"Reverse Engineering", title:"Reverse engineering the activity",
@@ -1202,7 +1199,7 @@ function renderSetup() {
         <div class="hiw-step"><span class="hiw-n">1</span><span>Name your team and choose a mission value that will guide your decisions.</span></div>
         <div class="hiw-step"><span class="hiw-n">2</span><span>You will face ten scenarios drawn from real expedition decision-making. Each one has no single correct answer.</span></div>
         <div class="hiw-step"><span class="hiw-n">3</span><span>Every choice affects three resources: <strong style="color:var(--ice)">Time</strong>, <strong style="color:var(--green)">Safety</strong>, and <strong style="color:var(--amber)">Energy</strong>. All start at 20. None can exceed 30 or fall below 0.</span></div>
-        <div class="hiw-step"><span class="hiw-n">4</span><span>After the final scenario, your mission outcome and a full debrief review will appear — including which options were most defensible and why.</span></div>
+        <div class="hiw-step"><span class="hiw-n">4</span><span>After the final scenario, your mission outcome and a full debrief review will appear: including which options were most defensible and why.</span></div>
       </div>
     </div>
     <div class="basmu-note">Inspired by applied work with extreme-environment and expedition partners, including work connected to the British Antarctic Survey Medical Unit. Designed as a teaching simulation, not a representation of any specific real mission.</div>
@@ -1328,7 +1325,7 @@ function renderPlaying() {
   </div>
   <div class="scene-progress">${dots}<span class="scene-progress-label">Scenario ${APP.scenarioIndex+1} of ${SCENARIOS.length}</span></div>
   <div class="scene-header">
-    <div class="scene-label">Scenario ${APP.scenarioIndex+1} — Antarctic Research Mission</div>
+    <div class="scene-label">Scenario ${APP.scenarioIndex+1}: Antarctic Research Mission</div>
     <div class="scene-title">${sc.title}</div>
   </div>
   <div class="scene-narrative">${sc.narrative}</div>
@@ -1428,7 +1425,7 @@ function renderDebrief() {
     }).join('');
     const bestCallout = sc.bestOption ? (isBest
       ? `<div class="best-callout best-hit"><span class="best-icon">★</span> Best choice</div>`
-      : `<div class="best-callout best-miss"><span class="best-icon">→</span> Suggested best: <strong>Option ${sc.bestOption}</strong> — ${sc.bestExplanation}</div>`)
+      : `<div class="best-callout best-miss"><span class="best-icon">→</span> Suggested best: <strong>Option ${sc.bestOption}</strong>: ${sc.bestExplanation}</div>`)
       : '';
     return `<div class="choice-row">
       <div class="cr-top">
@@ -1528,7 +1525,7 @@ function confirmReset() {
 function downloadDebrief() {
   const outcome = calcOutcome();
   const titles = { excellent:'Excellent Mission Readiness', viable:'Viable but Stretched', fragile:'Fragile Mission', serious:'Mission at Serious Risk' };
-  let txt = `SPARC FOR EDUCATION — MISSION DEBRIEF\n${'═'.repeat(44)}\n\n`;
+  let txt = `SPARC FOR EDUCATION: MISSION DEBRIEF\n${'═'.repeat(44)}\n\n`;
   txt += `Team: ${APP.team.name}\n`;
   txt += `Members: ${APP.team.members || 'Not recorded'}\n`;
   txt += `Mission value: ${APP.team.value || 'Not selected'}\n\n`;
@@ -1537,7 +1534,7 @@ function downloadDebrief() {
   txt += `CHOICES MADE\n`;
   APP.choices.forEach((c, i) => {
     const sc = SCENARIOS[i];
-    txt += `Scenario ${i+1} — ${sc.title}: Option ${c.option}\n`;
+    txt += `Scenario ${i+1}: ${sc.title}: Option ${c.option}\n`;
     txt += `  "${sc.options.find(o=>o.label===c.option).text}"\n`;
     txt += `  Effect: Time ${c.effect.time>=0?'+':''}${c.effect.time}, Safety ${c.effect.safety>=0?'+':''}${c.effect.safety}, Energy ${c.effect.energy>=0?'+':''}${c.effect.energy}\n\n`;
   });
@@ -1589,7 +1586,7 @@ function loadImages() {
    COPY SPARC
 ═══════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════
-   SLIDE 17 DESIGN WORKSHEET — save / load / download
+   SLIDE 17 DESIGN WORKSHEET: save / load / download
 ═══════════════════════════════════════════════════════════ */
 const SD_KEYS = ['sd_context','sd_scenario','sd_decision','sd_constraints','sd_reflect','sd_curriculum'];
 
@@ -1622,7 +1619,7 @@ function downloadSparcMd() {
   const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 
   const md = `# My SPARC Design + Claude Build Prompt
-*Generated from SPARC for Education — Dr Jonathan Rhodes, University of Plymouth*
+*Generated from SPARC for Education: Dr Jonathan Rhodes, University of Plymouth*
 *Date: ${today}*
 
 ---
@@ -1651,7 +1648,7 @@ ${curriculum}
 
 ## Part 2: Claude Build Prompt
 
-> Copy everything from this heading to the end of the document and paste it into Claude (claude.ai) or into the Claude extension in Visual Studio Code as your first message. You can add or change anything — this is a starting point, not a script.
+> Copy everything from this heading to the end of the document and paste it into Claude (claude.ai) or into the Claude extension in Visual Studio Code as your first message. You can add or change anything: this is a starting point, not a script.
 
 ---
 
@@ -1681,7 +1678,7 @@ ${curriculum}
 
 ## Architecture
 
-- One \`index.html\` file — all HTML, CSS, and JavaScript inline, nothing external.
+- One \`index.html\` file: all HTML, CSS, and JavaScript inline, nothing external.
 - Four pages navigated by tab bar: Home, Teaching Slides, Scenario Experience, About.
 - \`localStorage\` persists all game state, team name, choices, and design notes across refreshes.
 - Works offline. Deployable to GitHub Pages with no build step.
@@ -1694,7 +1691,7 @@ ${curriculum}
 - Animated particle canvas background on all pages (subtle drifting dots, no performance impact).
 - Clean sans-serif typography (system font stack).
 - Smooth CSS animations for page transitions (\`fadeUp\`, \`pageIn\`).
-- Responsive — works on mobile (320px) and desktop (1200px+).
+- Responsive: works on mobile (320px) and desktop (1200px+).
 
 ## Pages
 
@@ -1714,7 +1711,7 @@ ${curriculum}
 Three phases rendered into a single container by JavaScript:
 
 **Setup phase**
-- A hero image at the top (\`./hero.png\` — I will supply this; use \`onerror="this.style.display='none'"\` as fallback).
+- A hero image at the top (\`./hero.png\`: I will supply this; use \`onerror="this.style.display='none'"\` as fallback).
 - A context card showing location/environment, time pressure, and duration.
 - A "How it works" numbered list (4 steps explaining the game).
 - Form fields: team name (auto-generated if blank), team members (optional), mission value (dropdown with 6 options relevant to my context).
@@ -1722,7 +1719,7 @@ Three phases rendered into a single container by JavaScript:
 
 **Playing phase**
 - Resource bar showing three resources relevant to my context. All start at 20, minimum 0, maximum 30.
-  - Choose three resources appropriate to my context (e.g. Time, Safety, Energy — or adapt to suit).
+  - Choose three resources appropriate to my context (e.g. Time, Safety, Energy: or adapt to suit).
   - Colour code: green above 10, amber 6–10, red 5 and below.
 - Progress dots (one per scenario, filled as completed).
 - Scenario card: title, narrative paragraph.
@@ -1749,10 +1746,10 @@ Three phases rendered into a single container by JavaScript:
 Generate exactly ten (10) scenarios based on my context above. Each scenario must:
 - Present a genuine dilemma where no option is obviously correct.
 - Offer four options (A–D) with meaningfully different trade-off profiles across the three resources.
-- Have a \`bestOption\` (the most professionally defensible choice) and a \`bestExplanation\` (2–3 sentences explaining why — written for a debrief audience, not as a judgment).
+- Have a \`bestOption\` (the most professionally defensible choice) and a \`bestExplanation\` (2–3 sentences explaining why: written for a debrief audience, not as a judgment).
 - Include a consequence for each option (1–2 sentences, cause-and-effect, no moralising).
 - Include a reflection question that connects to theory, professional practice, or the learning outcomes.
-- Use real language from my discipline or context — not generic placeholder text.
+- Use real language from my discipline or context: not generic placeholder text.
 
 Format each scenario exactly as follows (JavaScript object literal):
 
@@ -1789,17 +1786,17 @@ Replace \`res1\`, \`res2\`, \`res3\` with your chosen resource names (e.g. \`tim
 
 ## What to generate, in order
 
-1. All ten scenarios (as JavaScript objects, formatted as above) — generate these first so they inform the slide content.
+1. All ten scenarios (as JavaScript objects, formatted as above): generate these first so they inform the slide content.
 2. The full \`index.html\` file from \`<!DOCTYPE html>\` to \`</html>\`, in one continuous output.
-3. Do not stop mid-file or ask for confirmation — complete the entire file.
+3. Do not stop mid-file or ask for confirmation: complete the entire file.
 4. After the file, provide a short list of any image assets I need to supply (names and recommended dimensions).
 
 ## Notes for the build
 
-- The tone throughout should match my discipline and context — use appropriate vocabulary.
+- The tone throughout should match my discipline and context: use appropriate vocabulary.
 - Avoid generic corporate language. Write as if a subject expert designed the activity.
 - The scenario consequences should feel authentic, not like a quiz marking scheme.
-- The reflection questions should be genuinely thought-provoking — the kind a good seminar tutor would ask.
+- The reflection questions should be genuinely thought-provoking: the kind a good seminar tutor would ask.
 - The debrief should help participants see patterns in their decision-making, not just tell them if they won.
 `;
 
@@ -1815,18 +1812,10 @@ Replace \`res1\`, \`res2\`, \`res3\` with your chosen resource names (e.g. \`tim
 }
 
 function copySparc() {
-  const text = `THE SPARC FRAMEWORK\n\nS — Scenario Learning\nStudents engage with realistic situations that mirror the complexity, ambiguity, and pressure of practice.\n\nP — Partnership\nPartnerships provide the reality: the pressures, constraints, and consequences that make learning authentic.\n\nA — Application\nApplication means students use ideas, not just recall them. They decide, negotiate, and justify.\n\nR — Reflection\nReflection turns activity into learning. Structured reflection makes consequences visible and meaningful.\n\nC — Curriculum\nCurriculum turns one good activity into a coherent teaching design with clear outcomes and assessment.\n\nSPARC Framework — Dr Jonathan Rhodes, University of Plymouth`;
+  const text = `THE SPARC FRAMEWORK\n\nS: Scenario Learning\nStudents engage with realistic situations that mirror the complexity, ambiguity, and pressure of practice.\n\nP: Partnership\nPartnerships provide the reality: the pressures, constraints, and consequences that make learning authentic.\n\nA: Application\nApplication means students use ideas, not just recall them. They decide, negotiate, and justify.\n\nR: Reflection\nReflection turns activity into learning. Structured reflection makes consequences visible and meaningful.\n\nC: Curriculum\nCurriculum turns one good activity into a coherent teaching design with clear outcomes and assessment.\n\nSPARC Framework: Dr Jonathan Rhodes, University of Plymouth`;
   navigator.clipboard.writeText(text).then(() => showToast('SPARC summary copied'));
 }
 
-function toggleTheme() {
-  const html = document.documentElement;
-  const isLight = html.dataset.theme === 'light';
-  html.dataset.theme = isLight ? '' : 'light';
-  document.getElementById('themeToggle').textContent = isLight ? '☀' : '☾';
-  try { localStorage.setItem('sparc_theme', html.dataset.theme); } catch(e) {}
-  initParticles();
-}
 
 function copyEmail() {
   navigator.clipboard.writeText('jonathan.rhodes@plymouth.ac.uk').then(() => showToast('Email address copied'));
@@ -1912,10 +1901,8 @@ function launchConfetti() {
    INIT
 ═══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore theme before first paint
-  const savedTheme = localStorage.getItem('sparc_theme') || '';
-  document.documentElement.dataset.theme = savedTheme;
-  if (savedTheme === 'light') document.getElementById('themeToggle').textContent = '☾';
+  // Force light mode always
+  document.documentElement.dataset.theme = 'light';
 
   loadApp();
   initParticles();
