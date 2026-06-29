@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPARC for Education | Dr Jonathan Rhodes</title>
+<style>
+:root {
+  --bg:         #060e1c;
+  --bg-surface: #0b1a2e;
+  --bg-raised:  #102038;
+  --bg-hover:   #152848;
+  --border:     rgba(70,140,200,0.14);
+  --border-lt:  rgba(70,140,200,0.26);
+  --border-br:  rgba(91,196,240,0.55);
+  --text:       #e4eff8;
+  --text-sub:   #94b8d4;
+  --text-muted: #4e7090;
+  --text-dim:   #2a4460;
+  --ice:        #5bc4f0;
+  --ice-br:     #82d6f8;
+  --ice-dim:    #2a6e90;
+  --amber:      #e8a530;
+  --amber-dim:  #7a5510;
+  --green:      #3dba7a;
+  --green-dim:  #1a5e3a;
+  --danger:     #e84040;
+  --danger-dim: #7a1818;
+  --nav-h:      62px;
+  --r:          12px;
+  --r-sm:       8px;
+  --font: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-lt);border-radius:3px}
+
+/* ── CANVAS ── */
+#particleCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35}
+#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:9000}
+
+/* ── NAV ── */
+#nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(6,14,28,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.75rem;gap:1.5rem;z-index:800}
+.nav-brand{display:flex;align-items:baseline;gap:.45rem;flex-shrink:0;cursor:pointer}
+.nav-sparc{font-size:1.2rem;font-weight:900;letter-spacing:.14em;color:var(--ice)}
+.nav-sub{font-size:.78rem;color:var(--text-muted);letter-spacing:.04em}
+.nav-links{display:flex;gap:.2rem;margin-left:auto}
+.nav-btn{background:none;border:1px solid transparent;color:var(--text-sub);padding:.38rem .85rem;border-radius:6px;font-family:var(--font);font-size:.83rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nav-btn:hover{color:var(--text);border-color:var(--border-lt);background:var(--bg-surface)}
+.nav-btn.active{color:var(--ice);border-color:var(--ice-dim);background:rgba(91,196,240,.08)}
+.nav-burger{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:.4rem}
+.nav-burger span{display:block;width:22px;height:2px;background:var(--text-sub);border-radius:2px;transition:all .3s}
+#mobileMenu{display:none;position:fixed;inset:0;background:rgba(6,14,28,.97);z-index:790;flex-direction:column;align-items:center;justify-content:center;gap:.75rem}
+#mobileMenu.open{display:flex}
+.mob-btn{font-size:1.15rem;font-weight:600;color:var(--text-sub);background:none;border:none;cursor:pointer;font-family:var(--font);padding:.7rem 2rem;border-radius:8px;transition:color .2s;width:100%;text-align:center}
+.mob-btn:hover{color:var(--ice)}
+.mob-close{position:absolute;top:1.4rem;right:1.4rem;background:none;border:none;color:var(--text-muted);font-size:1.6rem;cursor:pointer;line-height:1}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;padding-top:var(--nav-h);position:relative;z-index:1}
+.page.active{display:block;animation:pageIn .38s ease both}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:1080px;margin:0 auto;padding:0 1.75rem}
+.section{padding:2.8rem 0}
+
+/* ── TYPOGRAPHY ── */
+.section-title{font-size:1.55rem;font-weight:800;letter-spacing:-.015em;margin-bottom:.4rem}
+.section-lead{font-size:.95rem;color:var(--text-sub);margin-bottom:1.75rem;max-width:660px;line-height:1.65}
+.label-chip{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ice);display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem}
+.label-chip::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.68rem 1.6rem;border-radius:8px;font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid transparent;text-decoration:none;line-height:1}
+.btn-primary{background:var(--ice);color:#040d1a;border-color:var(--ice)}
+.btn-primary:hover{background:var(--ice-br);box-shadow:0 6px 22px rgba(91,196,240,.28);transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--ice);border-color:var(--ice-dim)}
+.btn-secondary:hover{background:rgba(91,196,240,.08);border-color:var(--ice)}
+.btn-amber{background:var(--amber);color:#040d1a;border-color:var(--amber)}
+.btn-amber:hover{background:#f0b840;box-shadow:0 6px 22px rgba(232,165,48,.28);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text-sub);border-color:var(--border-lt)}
+.btn-ghost:hover{background:var(--bg-raised);color:var(--text)}
+.btn-danger{background:transparent;color:var(--danger);border-color:var(--danger-dim)}
+.btn-danger:hover{background:rgba(232,64,64,.1)}
+.btn:active{transform:scale(.98);box-shadow:none}
+.btn-sm{padding:.45rem 1rem;font-size:.82rem}
+
+/* ── CARDS ── */
+.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem;transition:border-color .2s}
+.card:hover{border-color:var(--border-lt)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInR{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInL{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes letterIn{from{opacity:0;transform:translateY(-28px) scale(.88);filter:blur(4px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes floatScore{0%{opacity:1;transform:translateY(0)}80%{opacity:.8}100%{opacity:0;transform:translateY(-42px)}}
+@keyframes barPulse{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+
+/* ── HOME HERO ── */
+.hero{padding:4.5rem 0 3.5rem;text-align:center}
+.hero-sparc{display:flex;justify-content:center;gap:.12em;margin-bottom:1.2rem}
+.hero-letter{font-size:clamp(3.5rem,9vw,7.5rem);font-weight:900;color:var(--ice);text-shadow:0 0 70px rgba(91,196,240,.38);opacity:0;animation:letterIn .6s cubic-bezier(.2,.8,.3,1) both}
+.hero-letter:nth-child(1){animation-delay:.08s}
+.hero-letter:nth-child(2){animation-delay:.18s}
+.hero-letter:nth-child(3){animation-delay:.28s}
+.hero-letter:nth-child(4){animation-delay:.38s}
+.hero-letter:nth-child(5){animation-delay:.48s}
+.hero-for{font-size:clamp(.9rem,2vw,1.2rem);font-weight:300;color:var(--text-muted);letter-spacing:.18em;text-transform:uppercase;opacity:0;animation:fadeUp .6s ease .65s both}
+.hero-education{font-size:clamp(1.2rem,3vw,2rem);font-weight:700;color:var(--text);margin-bottom:1rem;opacity:0;animation:fadeUp .6s ease .75s both}
+.hero-tagline{font-size:clamp(.9rem,1.8vw,1.1rem);color:var(--text-sub);max-width:580px;margin:0 auto 2rem;line-height:1.55;opacity:0;animation:fadeUp .6s ease .85s both}
+.hero-actions{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp .6s ease 1s both}
+
+/* ── HOME OVERVIEW ── */
+.blockquote{background:linear-gradient(135deg,var(--bg-surface),var(--bg-raised));border:1px solid var(--border-lt);border-radius:var(--r);padding:2rem 2.25rem;position:relative;overflow:hidden}
+.blockquote::before{content:'"';position:absolute;top:-.8rem;left:1.2rem;font-size:7rem;color:var(--ice-dim);opacity:.18;font-family:Georgia,serif;line-height:1;pointer-events:none}
+.blockquote p{font-size:.98rem;line-height:1.78;color:var(--text-sub);position:relative}
+
+/* ── OUTCOMES ── */
+.outcomes{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.outcomes li{display:flex;align-items:flex-start;gap:.9rem;padding:.85rem 1.1rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-sm);transition:border-color .2s}
+.outcomes li:hover{border-color:var(--ice-dim)}
+.out-num{flex-shrink:0;width:26px;height:26px;background:rgba(91,196,240,.12);color:var(--ice);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700}
+.out-text{font-size:.9rem;color:var(--text-sub)}
+
+/* ── SPARC FLOW ── */
+.sparc-flow{display:flex;align-items:stretch;overflow-x:auto;gap:0;padding:.5rem 0 1rem;scrollbar-width:thin}
+.sparc-step{flex:1;min-width:148px;text-align:center;padding:1.5rem 1rem;position:relative}
+.sparc-step:not(:last-child)::after{content:'→';position:absolute;right:-6px;top:50%;transform:translateY(-60%);color:var(--ice-dim);font-size:1.1rem;z-index:1}
+.sparc-icon{display:inline-flex;width:50px;height:50px;background:rgba(91,196,240,.1);border:2px solid var(--ice-dim);border-radius:10px;align-items:center;justify-content:center;font-size:1.45rem;font-weight:900;color:var(--ice);margin-bottom:.7rem}
+.sparc-word{font-size:.75rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.sparc-desc{font-size:.76rem;color:var(--text-muted);line-height:1.4}
+
+/* ── IMAGE UPLOAD ── */
+.img-card{background:var(--bg-surface);border:2px dashed var(--border-lt);border-radius:var(--r);padding:1.4rem;text-align:center;transition:all .2s}
+.img-card:hover{border-color:var(--ice-dim);background:var(--bg-raised)}
+.img-preview{width:100%;height:160px;background:var(--bg);border-radius:8px;margin-bottom:1rem;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:.8rem;flex-direction:column;gap:.4rem}
+.img-preview img{width:100%;height:100%;object-fit:cover}
+.img-caption{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.45rem .7rem;border-radius:6px;font-family:var(--font);font-size:.82rem;margin-top:.6rem}
+.img-caption::placeholder{color:var(--text-dim)}
+.img-caption:focus{outline:none;border-color:var(--ice-dim)}
+.img-type-label{font-size:.72rem;color:var(--text-muted);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.06em}
+
+/* ── SLIDE DECK ── */
+.slide-bar{background:var(--bg-surface);border-bottom:1px solid var(--border);padding:.8rem 1.75rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;position:sticky;top:var(--nav-h);z-index:100}
+.slide-counter{font-size:.82rem;color:var(--text-muted);white-space:nowrap;min-width:90px}
+.progress-track{flex:1;height:4px;background:var(--bg-raised);border-radius:2px;min-width:80px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--ice-dim),var(--ice));border-radius:2px;transition:width .4s ease}
+.slide-nav-btns{display:flex;gap:.4rem}
+.slide-btn{width:34px;height:34px;background:var(--bg-raised);border:1px solid var(--border);color:var(--text-sub);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .2s}
+.slide-btn:hover:not(:disabled){background:var(--bg-hover);color:var(--text);border-color:var(--border-lt)}
+.slide-btn:disabled{opacity:.3;cursor:default}
+.slide-area{max-width:880px;margin:2rem auto;padding:0 1.75rem}
+.slide-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;padding:2.75rem;min-height:460px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.slide-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--ice),var(--ice-dim))}
+.slide-card.slide-r{animation:slideInR .32s ease both}
+.slide-card.slide-l{animation:slideInL .32s ease both}
+.slide-number{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ice);margin-bottom:.9rem}
+.slide-title{font-size:clamp(1.4rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:1.4rem;line-height:1.2}
+.slide-body{flex:1;font-size:.95rem;color:var(--text-sub);line-height:1.72}
+.slide-body p{margin-bottom:.9rem}
+.slide-body p:last-child{margin-bottom:0}
+.slide-quote{background:rgba(91,196,240,.07);border:1px solid var(--ice-dim);border-radius:8px;padding:.95rem 1.2rem;color:var(--text);font-style:italic;margin:1rem 0;line-height:1.6}
+.slide-list{list-style:none;display:flex;flex-direction:column;gap:.45rem;margin:.5rem 0}
+.slide-list li{display:flex;align-items:flex-start;gap:.7rem;color:var(--text-sub);font-size:.92rem}
+.slide-list li::before{content:'›';color:var(--ice-dim);flex-shrink:0;margin-top:.05em}
+.slide-chips{display:flex;gap:.6rem;flex-wrap:wrap;margin:.9rem 0}
+.slide-chip{background:rgba(91,196,240,.08);border:1px solid var(--ice-dim);border-radius:6px;padding:.45rem .9rem;font-size:.85rem;font-weight:600;color:var(--ice);display:flex;align-items:center;gap:.45rem}
+.slide-chip .n{width:20px;height:20px;background:var(--ice);color:#040d1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;flex-shrink:0}
+.slide-mini-cards{display:flex;gap:.9rem;flex-wrap:wrap;margin:.9rem 0}
+.slide-mini{flex:1;min-width:90px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:.9rem;text-align:center;font-weight:700;color:var(--ice);font-size:.9rem}
+.facil-toggle{font-size:.76rem;color:var(--amber);background:none;border:1px solid rgba(232,165,48,.28);border-radius:4px;padding:.22rem .55rem;cursor:pointer;font-family:var(--font);transition:all .2s;margin-top:1.4rem;align-self:flex-start}
+.facil-toggle:hover{background:rgba(232,165,48,.1)}
+.facil-note{margin-top:.75rem;padding:.9rem 1.1rem;background:rgba(232,165,48,.06);border:1px solid rgba(232,165,48,.2);border-radius:8px;font-size:.84rem;color:var(--amber);line-height:1.5}
+.slide-cta{margin-top:1.75rem;padding-top:1.4rem;border-top:1px solid var(--border);display:flex;gap:.75rem;flex-wrap:wrap}
+.slide-rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:.9rem 0}
+.slide-rc-col h4{font-size:.8rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.6rem}
+.slide-design-form{display:flex;flex-direction:column;gap:.8rem;margin:.9rem 0}
+.slide-design-form label{font-size:.82rem;color:var(--text-muted);display:block;margin-bottom:.3rem}
+.slide-design-form textarea{width:100%;background:var(--bg-raised);border:1px solid var(--border);color:var(--text);padding:.55rem .8rem;border-radius:6px;font-family:var(--font);font-size:.85rem;resize:vertical;min-height:52px;line-height:1.5}
+.slide-design-form textarea:focus{outline:none;border-color:var(--ice-dim)}
+
+/* ── SCENARIO SETUP ── */
+.scene-wrap{max-width:860px;margin:0 auto;padding:2rem 1.75rem}
+.setup-box{max-width:580px;margin:0 auto}
+.setup-hero{text-align:center;margin-bottom:2.5rem;animation:fadeUp .5s ease both}
+.setup-hero h1{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;letter-spacing:-.02em;margin-bottom:.5rem}
+.setup-hero p{color:var(--text-sub);font-size:.95rem;line-height:1.65;max-width:480px;margin:0 auto}
+.form-field{margin-bottom:1.25rem}
+.form-label{font-size:.82rem;font-weight:600;color:var(--text-sub);letter-spacing:.03em;display:block;margin-bottom:.4rem}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--bg-surface);border:1px solid var(--border-lt);color:var(--text);padding:.7rem .95rem;border-radius:8px;font-family:var(--font);font-size:.92rem;transition:border-color .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--ice);box-shadow:0 0 0 3px rgba(91,196,240,.1)}
+.form-select option{background:var(--bg-surface)}
+.form-textarea{resize:vertical;min-height:72px}
+.form-hint{font-size:.75rem;color:var(--text-muted);margin-top:.3rem}
+.basmu-note{background:rgba(91,196,240,.05);border:1px solid var(--border);border-radius:8px;padding:.9rem 1.1rem;font-size:.8rem;color:var(--text-muted);line-height:1.55;margin-bottom:1.5rem}
+.setup-img{width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-bottom:1.75rem;border:1px solid var(--border);opacity:0}
+.depth-card{display:flex;flex-direction:column;gap:.5rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1.5rem}
+.depth-item{display:flex;gap:.75rem;align-items:baseline;font-size:.84rem}
+.depth-lbl{flex-shrink:0;width:90px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)}
+.depth-val{color:var(--text-sub);line-height:1.4}
+.how-it-works{background:var(--bg-raised);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1.5rem;border:1px solid var(--border)}
+.hiw-title{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ice);margin-bottom:.75rem}
+.hiw-steps{display:flex;flex-direction:column;gap:.55rem}
+.hiw-step{display:flex;gap:.65rem;align-items:flex-start;font-size:.84rem;color:var(--text-sub);line-height:1.5}
+.hiw-n{flex-shrink:0;width:20px;height:20px;background:rgba(91,196,240,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;color:var(--ice);margin-top:.1rem}
+
+/* ── SCENARIO PLAYING ── */
+.resource-panel{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.4rem;margin-bottom:1.5rem}
+.resource-row{display:flex;flex-direction:column;gap:.7rem}
+.resource-item{display:grid;grid-template-columns:72px 1fr 44px;align-items:center;gap:.7rem;position:relative}
+.res-label{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-sub)}
+.res-track{height:10px;background:var(--bg);border-radius:5px;overflow:visible;position:relative}
+.res-fill{height:100%;border-radius:5px;transition:width .65s cubic-bezier(.4,0,.2,1)}
+.res-fill.time{background:linear-gradient(90deg,var(--ice-dim),var(--ice))}
+.res-fill.safety{background:linear-gradient(90deg,var(--green-dim),var(--green))}
+.res-fill.energy{background:linear-gradient(90deg,var(--amber-dim),var(--amber))}
+.res-fill.low{background:linear-gradient(90deg,var(--danger-dim),var(--danger));animation:barPulse 1.1s ease infinite}
+.res-val{font-size:1.05rem;font-weight:800;text-align:right}
+.res-val.time{color:var(--ice)}
+.res-val.safety{color:var(--green)}
+.res-val.energy{color:var(--amber)}
+.res-val.low{color:var(--danger)}
+.score-float{position:absolute;right:-6px;top:-26px;font-size:.88rem;font-weight:800;pointer-events:none;animation:floatScore 1.3s ease both;z-index:20}
+.score-float.pos{color:var(--green)}
+.score-float.neg{color:var(--danger)}
+.scene-header{margin-bottom:1.25rem}
+.scene-label{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ice);margin-bottom:.4rem}
+.scene-title{font-size:1.55rem;font-weight:800;letter-spacing:-.015em;margin-bottom:.3rem}
+.scene-narrative{color:var(--text-sub);line-height:1.7;font-size:.92rem;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:1.1rem 1.25rem;margin-bottom:1.4rem}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.4rem}
+@media(max-width:560px){.choices{grid-template-columns:1fr}}
+.choice{background:var(--bg-surface);border:1px solid var(--border-lt);border-radius:var(--r);padding:1.1rem;cursor:pointer;transition:all .22s;position:relative;text-align:left}
+.choice:hover:not(.locked){border-color:var(--ice-dim);transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.28)}
+.choice:active:not(.locked){transform:scale(.99)}
+.choice.selected{border-color:var(--ice);background:rgba(91,196,240,.07);box-shadow:0 0 0 1px var(--ice),0 8px 24px rgba(91,196,240,.14)}
+.choice.dismissed{opacity:.28;filter:saturate(0);pointer-events:none}
+.choice.locked{cursor:default}
+.choice-ltr{display:inline-flex;width:30px;height:30px;background:rgba(91,196,240,.1);border:1px solid var(--ice-dim);color:var(--ice);border-radius:6px;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;margin-bottom:.65rem}
+.choice.selected .choice-ltr{background:var(--ice);color:#040d1a;border-color:var(--ice)}
+.choice-text{font-size:.87rem;color:var(--text-sub);line-height:1.5;margin-bottom:.7rem}
+.choice.selected .choice-text{color:var(--text)}
+.effect-pills{display:flex;gap:.4rem;flex-wrap:wrap}
+.pill{font-size:.68rem;font-weight:700;padding:.18rem .45rem;border-radius:4px}
+.pill.pos{background:rgba(61,186,122,.15);color:var(--green)}
+.pill.neg{background:rgba(232,64,64,.15);color:var(--danger)}
+.pill.neu{background:rgba(78,112,144,.15);color:var(--text-muted)}
+.consequence-panel{background:var(--bg-raised);border:1px solid var(--border-lt);border-radius:var(--r);padding:1.4rem;animation:slideUp .38s ease both}
+.cons-title{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.4rem}
+.cons-text{font-size:.92rem;color:var(--text-sub);line-height:1.65;margin-bottom:1rem}
+.reflect-box{background:rgba(91,196,240,.06);border:1px solid var(--ice-dim);border-radius:8px;padding:.9rem 1.1rem;animation:fadeIn .4s ease .35s both;opacity:0;animation-fill-mode:both}
+.reflect-lbl{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ice);margin-bottom:.35rem}
+.reflect-text{font-size:.88rem;color:var(--text);font-style:italic;line-height:1.5}
+.scene-progress{display:flex;gap:.35rem;align-items:center;margin-bottom:1.4rem;flex-wrap:wrap}
+.scene-dot{width:8px;height:8px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border);transition:all .3s}
+.scene-dot.done{background:var(--ice);border-color:var(--ice)}
+.scene-dot.current{width:22px;border-radius:4px;background:rgba(91,196,240,.3);border-color:var(--ice)}
+.scene-progress-label{font-size:.75rem;color:var(--text-muted);margin-left:.3rem}
+.next-btn-row{margin-top:1.2rem;display:flex;gap:.75rem;flex-wrap:wrap}
+
+/* ── DEBRIEF ── */
+.debrief{animation:fadeUp .5s ease both}
+.outcome-banner{border-radius:14px;padding:2.2rem;margin-bottom:1.75rem;text-align:center;position:relative;overflow:hidden}
+.outcome-banner.excellent{background:linear-gradient(135deg,rgba(61,186,122,.14),rgba(61,186,122,.04));border:1px solid rgba(61,186,122,.3)}
+.outcome-banner.viable{background:linear-gradient(135deg,rgba(91,196,240,.12),rgba(91,196,240,.04));border:1px solid rgba(91,196,240,.25)}
+.outcome-banner.fragile{background:linear-gradient(135deg,rgba(232,165,48,.12),rgba(232,165,48,.04));border:1px solid rgba(232,165,48,.28)}
+.outcome-banner.serious{background:linear-gradient(135deg,rgba(232,64,64,.12),rgba(232,64,64,.04));border:1px solid rgba(232,64,64,.28)}
+.outcome-cat{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
+.outcome-cat.excellent{color:var(--green)}
+.outcome-cat.viable{color:var(--ice)}
+.outcome-cat.fragile{color:var(--amber)}
+.outcome-cat.serious{color:var(--danger)}
+.outcome-title{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:900;letter-spacing:-.02em;margin-bottom:.7rem}
+.outcome-desc{font-size:.92rem;color:var(--text-sub);max-width:580px;margin:0 auto .9rem;line-height:1.65}
+.outcome-vuln{font-size:.84rem;color:var(--amber);font-style:italic}
+.team-tag{display:inline-block;background:rgba(91,196,240,.1);border:1px solid var(--ice-dim);border-radius:6px;padding:.3rem .8rem;font-size:.82rem;color:var(--ice);font-weight:600;margin-bottom:.75rem}
+.final-scores{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.75rem}
+@media(max-width:540px){.final-scores{grid-template-columns:1fr}}
+.fs-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);padding:1.3rem;text-align:center}
+.fs-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:.4rem}
+.fs-value{font-size:3rem;font-weight:900;line-height:1;margin-bottom:.4rem}
+.fs-value.time{color:var(--ice)}
+.fs-value.safety{color:var(--green)}
+.fs-value.energy{color:var(--amber)}
+.fs-value.low{color:var(--danger)}
+.fs-bar-track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.fs-bar-fill{height:100%;border-radius:3px;transition:width 1.1s cubic-bezier(.4,0,.2,1)}
+.fs-bar-fill.time{background:linear-gradient(90deg,var(--ice-dim),var(--ice))}
+.fs-bar-fill.safety{background:linear-gradient(90deg,var(--green-dim),var(--green))}
+.fs-bar-fill.energy{background:linear-gradient(90deg,var(--amber-dim),var(--amber))}
+.choices-accordion{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.75rem}
+.acc-head{padding:.95rem 1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;transition:background .2s}
+.acc-head:hover{background:var(--bg-raised)}
+.acc-arrow{color:var(--text-muted);transition:transform .25s;font-size:.85rem}
+.choices-accordion.open .acc-arrow{transform:rotate(180deg)}
+.acc-body{display:none;border-top:1px solid var(--border);animation:slideUp .28s ease both}
+.choices-accordion.open .acc-body{display:block}
+.choice-row{display:flex;flex-direction:column;padding:.75rem 1.4rem;border-bottom:1px solid var(--border);font-size:.84rem;gap:.25rem}
+.choice-row:last-child{border-bottom:none}
+.cr-top{display:flex;gap:.7rem;align-items:flex-start}
+.cr-num{flex-shrink:0;width:22px;height:22px;background:var(--bg-raised);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:var(--text-muted)}
+.cr-ltr{font-weight:800;color:var(--ice);flex-shrink:0;margin-top:1px}
+.cr-text{color:var(--text-sub);line-height:1.5}
+.best-callout{font-size:.8rem;line-height:1.5;border-radius:6px;padding:.45rem .75rem;margin-top:.25rem}
+.best-hit{background:rgba(61,186,122,.1);border:1px solid rgba(61,186,122,.3);color:var(--green);font-weight:700}
+.best-miss{background:rgba(91,196,240,.07);border:1px solid rgba(91,196,240,.2);color:var(--text-sub)}
+.best-miss strong{color:var(--ice)}
+.best-icon{margin-right:.25rem}
+.debrief-qs{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;margin-bottom:1.75rem}
+.dq{display:flex;gap:.9rem;padding:.65rem 0;border-bottom:1px solid var(--border);font-size:.89rem;color:var(--text-sub)}
+.dq:last-child{border-bottom:none}
+.dq-n{flex-shrink:0;color:var(--ice);font-weight:700}
+.debrief-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+
+/* ── CONTACT ── */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.75rem;margin-bottom:2rem}
+@media(max-width:720px){.contact-grid{grid-template-columns:1fr}}
+.contact-name{font-size:1.35rem;font-weight:800;margin-bottom:.2rem}
+.contact-role{font-size:.9rem;color:var(--ice);margin-bottom:.15rem}
+.contact-inst{font-size:.84rem;color:var(--text-muted);margin-bottom:1.3rem}
+.contact-row{display:flex;align-items:center;gap:.7rem;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.88rem}
+.contact-row:last-child{border-bottom:none}
+.c-lbl{color:var(--text-muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;min-width:60px}
+.qr-box{background:var(--bg);border:2px dashed var(--border-lt);border-radius:8px;padding:1.75rem;text-align:center;color:var(--text-dim);font-size:.82rem;margin-top:1rem;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.impact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.75rem;margin-bottom:2rem}
+@media(max-width:720px){.impact-grid{grid-template-columns:1fr}}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:1.75rem;right:1.75rem;background:var(--green);color:#040d1a;padding:.65rem 1.1rem;border-radius:8px;font-size:.88rem;font-weight:600;opacity:0;transform:translateY(8px);transition:all .3s;z-index:9999;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+
+/* ── IMAGE FADE-IN ── */
+.asset-img{width:100%;height:100%;object-fit:cover;opacity:0}
+.looks-cold-img{width:100%;max-height:280px;object-fit:cover;border-radius:12px;display:block;opacity:0}
+.slide-img{width:100%;max-height:240px;object-fit:cover;border-radius:10px;margin:1rem 0;display:block;opacity:0}
+.profile-img{width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid var(--ice-dim);flex-shrink:0;opacity:0}
+.plym-logo{height:36px;object-fit:contain;filter:brightness(1.1);opacity:0}
+
+/* ── NOTES PANEL ── */
+#notesPanel{position:fixed;top:0;right:0;width:320px;max-width:90vw;height:100vh;background:var(--bg-surface);border-left:1px solid var(--border-lt);z-index:900;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease}
+#notesPanel.open{transform:translateX(0)}
+.notes-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0;padding-top:calc(var(--nav-h) + .5rem)}
+.notes-head strong{font-size:.9rem;color:var(--text)}
+.notes-close{background:none;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer;line-height:1}
+#notesArea{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:.88rem;line-height:1.65;padding:1.1rem 1.25rem;resize:none;outline:none}
+#notesArea::placeholder{color:var(--text-dim)}
+.notes-foot{padding:.9rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:.6rem;flex-shrink:0}
+
+/* ── BEST OPTION BADGE ── */
+.best-badge{display:inline-flex;align-items:center;gap:.35rem;background:rgba(61,186,122,.12);border:1px solid rgba(61,186,122,.3);border-radius:5px;padding:.2rem .55rem;font-size:.7rem;font-weight:700;color:var(--green);margin-left:.5rem}
+.best-explain{font-size:.78rem;color:var(--green);line-height:1.45;margin-top:.4rem;padding:.5rem .75rem;background:rgba(61,186,122,.06);border-radius:6px}
+
+/* ── SCENARIO DEPTH CARD ── */
+.mission-brief{background:var(--bg-raised);border:1px solid var(--border-lt);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem}
+.brief-item{font-size:.8rem;color:var(--text-sub);line-height:1.4}
+.brief-item strong{display:block;font-size:.67rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.15rem}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:2rem 0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:720px){
+  .nav-links{display:none}
+  .nav-burger{display:flex}
+  .slide-card{padding:1.5rem}
+  .slide-area{padding:0 1rem}
+  .contact-grid,.impact-grid{grid-template-columns:1fr}
+  .final-scores{grid-template-columns:1fr}
+  .sparc-flow{flex-direction:column}
+  .sparc-step::after{display:none}
+}
+@media print{
+  #nav,#particleCanvas,#confettiCanvas,#toast,.btn,.slide-bar,#mobileMenu{display:none!important}
+  body{background:white;color:#111}
+  .page{padding-top:0}
+}
+</style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+<canvas id="confettiCanvas"></canvas>
+<div id="toast"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-brand" onclick="navigate('home')">
+    <span class="nav-sparc">SPARC</span>
+    <span class="nav-sub">for Education</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" data-page="home" onclick="navigate('home')">Home</button>
+    <button class="nav-btn" data-page="teaching" onclick="navigate('teaching')">Teaching &amp; Learning</button>
+    <button class="nav-btn" data-page="scenario" onclick="navigate('scenario')">Scenario Experience</button>
+    <button class="nav-btn" data-page="contact" onclick="navigate('contact')">Contact / Impact</button>
+  </div>
+  <button class="nav-btn" onclick="toggleNotesPanel()" style="flex-shrink:0;border-color:var(--border-lt)">Notes</button>
+  <button class="nav-burger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- NOTES PANEL -->
+<div id="notesPanel">
+  <div class="notes-head">
+    <strong>Session Notes</strong>
+    <button class="notes-close" onclick="toggleNotesPanel()">✕</button>
+  </div>
+  <textarea id="notesArea" placeholder="Type your notes here as you go through the session. They will be saved automatically and included when you download your debrief."></textarea>
+  <div class="notes-foot">
+    <button class="btn btn-primary btn-sm" style="flex:1" onclick="downloadNotes()">Download notes</button>
+    <button class="btn btn-ghost btn-sm" onclick="clearNotes()">Clear</button>
+  </div>
+</div>
+
+<div id="mobileMenu">
+  <button class="mob-close" onclick="toggleMenu()">✕</button>
+  <button class="mob-btn" onclick="navigate('home');toggleMenu()">Home</button>
+  <button class="mob-btn" onclick="navigate('teaching');toggleMenu()">Teaching &amp; Learning</button>
+  <button class="mob-btn" onclick="navigate('scenario');toggleMenu()">Scenario Experience</button>
+  <button class="mob-btn" onclick="navigate('contact');toggleMenu()">Contact / Impact</button>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE: HOME
+════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <div class="container">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-sparc" aria-label="SPARC">
+        <span class="hero-letter">S</span>
+        <span class="hero-letter">P</span>
+        <span class="hero-letter">A</span>
+        <span class="hero-letter">R</span>
+        <span class="hero-letter">C</span>
+      </div>
+      <div class="hero-for">for</div>
+      <div class="hero-education">Education</div>
+      <div class="hero-tagline">From Research to Curriculum: The SPARC Framework for Scenario-Based Learning</div>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="navigate('teaching')">Begin Session ›</button>
+        <button class="btn btn-secondary" onclick="navigate('scenario')">Scenario Experience</button>
+      </div>
+      <div style="margin-top:2rem;opacity:0;animation:fadeUp .6s ease 1.3s both">
+        <img src="./plymouth-logo-white.png" alt="University of Plymouth" class="plym-logo">
+      </div>
+    </div>
+
+    <!-- Session overview -->
+    <div class="section">
+      <div class="label-chip">Session overview</div>
+      <h2 class="section-title">What this session is about</h2>
+      <div class="blockquote">
+        <p>This session explores how academics can translate research partnerships into meaningful learning experiences. Using the SPARC Framework, delegates will see how field research with partners in defence, sport, business, sustainability, and exploration can be transformed into scenario-based teaching that students actively experience.</p>
+      </div>
+    </div>
+
+    <!-- Why it matters -->
+    <div class="section" style="padding-top:0">
+      <div class="label-chip">The problem</div>
+      <h2 class="section-title">Why this matters</h2>
+      <div class="blockquote">
+        <p>Research often reaches students as a lecture example, reading list item, or case study. Those approaches have value, but they rarely allow students to experience the uncertainty, judgement, collaboration, and trade-offs that sit inside real-world practice. SPARC helps educators move from telling students about research to designing learning experiences where students apply ideas, make decisions, and reflect on consequences.</p>
+      </div>
+    </div>
+
+    <!-- Learning outcomes -->
+    <div class="section" style="padding-top:0">
+      <div class="label-chip">Learning outcomes</div>
+      <h2 class="section-title">By the end of the session you will be able to</h2>
+      <ol class="outcomes">
+        <li><span class="out-num">1</span><span class="out-text">Explain how research partnerships can inform curriculum design.</span></li>
+        <li><span class="out-num">2</span><span class="out-text">Describe the five stages of the SPARC Framework.</span></li>
+        <li><span class="out-num">3</span><span class="out-text">Experience scenario-based learning as a method for applied teaching.</span></li>
+        <li><span class="out-num">4</span><span class="out-text">Identify how uncertainty, risk, and team dynamics can be used constructively in learning design.</span></li>
+        <li><span class="out-num">5</span><span class="out-text">Draft one idea for adapting SPARC within your own teaching context.</span></li>
+      </ol>
+    </div>
+
+    <!-- SPARC Framework -->
+    <div class="section" style="padding-top:0">
+      <div class="label-chip">The framework</div>
+      <h2 class="section-title">The SPARC Framework</h2>
+      <p class="section-lead">A practical design route for turning research partnerships into applied learning experiences.</p>
+      <div class="sparc-flow">
+        <div class="sparc-step">
+          <div class="sparc-icon">S</div>
+          <div class="sparc-word">Scenario Learning</div>
+          <div class="sparc-desc">Students enter realistic situations that mirror real-world complexity.</div>
+        </div>
+        <div class="sparc-step">
+          <div class="sparc-icon">P</div>
+          <div class="sparc-word">Partnership</div>
+          <div class="sparc-desc">External partners provide the context, constraints, and authenticity.</div>
+        </div>
+        <div class="sparc-step">
+          <div class="sparc-icon">A</div>
+          <div class="sparc-word">Application</div>
+          <div class="sparc-desc">Students use ideas, not just recall them; they decide, negotiate, and justify.</div>
+        </div>
+        <div class="sparc-step">
+          <div class="sparc-icon">R</div>
+          <div class="sparc-word">Reflection</div>
+          <div class="sparc-desc">Activity becomes learning through structured reflection on decisions made.</div>
+        </div>
+        <div class="sparc-step">
+          <div class="sparc-icon">C</div>
+          <div class="sparc-word">Curriculum</div>
+          <div class="sparc-desc">One activity becomes a coherent, embeddable teaching design.</div>
+        </div>
+      </div>
+      <div style="margin-top:1.25rem">
+        <button class="btn btn-ghost btn-sm" onclick="copySparc()">Copy SPARC summary ↗</button>
+      </div>
+    </div>
+
+    <!-- Image uploads -->
+    <div class="section" style="padding-top:0">
+      <div class="label-chip">Session images</div>
+      <h2 class="section-title">Add session images</h2>
+      <p class="section-lead">Upload images to display during the session. They are saved locally in your browser and will persist until you clear your browser data.</p>
+      <div class="card-grid">
+        <div class="img-card">
+          <div class="img-type-label">Field research / partnership</div>
+          <div class="img-preview" id="imgPreview_0">
+            <img src="./IMG_7295.jpg" alt="Field research and partnership" class="asset-img delay-1">
+          </div>
+          <input type="file" accept="image/*" id="imgInput_0" style="display:none" onchange="handleImg(0,this)">
+          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:.5rem" onclick="document.getElementById('imgInput_0').click()">Replace image</button>
+          <input class="img-caption" type="text" placeholder="Add a caption…" id="imgCaption_0" oninput="saveCaption(0,this.value)">
+        </div>
+        <div class="img-card">
+          <div class="img-type-label">Scenario learning / classroom</div>
+          <div class="img-preview" id="imgPreview_1">
+            <img src="./MOCAP.png" alt="Scenario learning in practice" class="asset-img delay-2">
+          </div>
+          <input type="file" accept="image/*" id="imgInput_1" style="display:none" onchange="handleImg(1,this)">
+          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:.5rem" onclick="document.getElementById('imgInput_1').click()">Replace image</button>
+          <input class="img-caption" type="text" placeholder="Add a caption…" id="imgCaption_1" oninput="saveCaption(1,this.value)">
+        </div>
+        <div class="img-card">
+          <div class="img-type-label">Reflection / curriculum</div>
+          <div class="img-preview" id="imgPreview_2">
+            <img src="./John_Diego.jpg" alt="Reflection and curriculum design" class="asset-img delay-3">
+          </div>
+          <input type="file" accept="image/*" id="imgInput_2" style="display:none" onchange="handleImg(2,this)">
+          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:.5rem" onclick="document.getElementById('imgInput_2').click()">Replace image</button>
+          <input class="img-caption" type="text" placeholder="Add a caption…" id="imgCaption_2" oninput="saveCaption(2,this.value)">
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /page-home -->
+
+
+<!-- ════════════════════════════════════════════════
+     PAGE: TEACHING & LEARNING
+════════════════════════════════════════════════ -->
+<div id="page-teaching" class="page">
+  <div class="slide-bar">
+    <span class="slide-counter" id="slideCounter">Slide 1 of 20</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:5%"></div></div>
+    <div style="display:flex;align-items:center;gap:.6rem">
+      <button class="btn btn-amber btn-sm" onclick="navigate('scenario')" style="flex-shrink:0">Launch Scenario ›</button>
+    </div>
+    <div class="slide-nav-btns">
+      <button class="slide-btn" id="slidePrev" onclick="goSlide(-1)" title="Previous">‹</button>
+      <button class="slide-btn" id="slideNext" onclick="goSlide(1)" title="Next">›</button>
+    </div>
+  </div>
+  <div class="slide-area">
+    <div class="slide-card" id="slideCard"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;flex-wrap:wrap;gap:.5rem">
+      <button class="btn btn-ghost btn-sm" onclick="navigate('home')">← Back to home</button>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="jumpSlide(8)">Jump to: Mission setup (Slide 9)</button>
+        <button class="btn btn-ghost btn-sm" onclick="jumpSlide(14)">Jump to: Design your own (Slide 15)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     PAGE: SCENARIO EXPERIENCE
+════════════════════════════════════════════════ -->
+<div id="page-scenario" class="page">
+  <div class="scene-wrap" id="sceneWrap">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     PAGE: CONTACT / IMPACT
+════════════════════════════════════════════════ -->
+<div id="page-contact" class="page">
+  <div class="container">
+
+    <div class="section">
+      <div class="label-chip">About the presenter</div>
+      <h2 class="section-title">Dr Jonathan Rhodes</h2>
+      <div class="contact-grid">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem">
+            <img src="./Screenshot_2025-08-26_at_15.21.42.png" alt="Dr Jonathan Rhodes" class="profile-img">
+            <div>
+              <div class="contact-name">Dr Jonathan Rhodes</div>
+              <div class="contact-role">Lecturer in Performance Psychology</div>
+              <div class="contact-inst">University of Plymouth</div>
+            </div>
+          </div>
+          <div class="contact-row"><span class="c-lbl">Email</span><span>jonathan.rhodes@plymouth.ac.uk</span><button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="copyEmail()">Copy</button></div>
+          <div class="contact-row"><span class="c-lbl">Role</span><span>Lecturer in Performance Psychology</span></div>
+          <div class="contact-row"><span class="c-lbl">Website</span><a href="https://www.plymouth.ac.uk/staff/jon-rhodes" target="_blank" style="color:var(--ice);font-size:.88rem">plymouth.ac.uk/staff/jon-rhodes</a></div>
+        </div>
+        <div class="card">
+          <div class="label-chip">About</div>
+          <p style="font-size:.92rem;color:var(--text-sub);line-height:1.75">Dr Jonathan Rhodes is a Lecturer in Performance Psychology at the University of Plymouth. His work focuses on motivation, imagery, performance psychology, and the translation of applied research into education, coaching, and real-world practice. He works across contexts including sport, defence, exploration, business, sustainability, and health behaviour. Dr Rhodes is also the co-author of <em style="color:var(--text)">The Choice Point</em>, a book exploring how psychological tools can support decision-making and performance under pressure.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="label-chip">Research unit</div>
+      <h2 class="section-title">Plymouth Exploration and Discovery Research Unit</h2>
+      <div class="card" style="margin-bottom:1.5rem">
+        <p style="font-size:.92rem;color:var(--text-sub);line-height:1.72">The Plymouth Exploration and Discovery Research Unit (PEDRU) brings together research, education, and applied practice linked to exploration, extreme environments, human performance, leadership, and decision-making under uncertainty. Its work connects academic insight with partners working in challenging environments, helping to understand how people prepare, adapt, lead, and perform when conditions are demanding.</p>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="label-chip">From research to education</div>
+      <h2 class="section-title">Impact</h2>
+      <div class="impact-grid">
+        <div class="card">
+          <div class="label-chip" style="margin-bottom:.8rem">SPARC in practice</div>
+          <p style="font-size:.92rem;color:var(--text-sub);line-height:1.72">The SPARC Framework is designed to make impact visible in the curriculum. Rather than treating external partnerships as separate from teaching, SPARC helps academics turn research relationships into learning experiences. Students do not simply hear about applied work; they enter scenarios, make decisions, reflect on consequences, and connect theory with practice.</p>
+        </div>
+        <div class="card">
+          <div class="label-chip" style="margin-bottom:.8rem">The SPARC question</div>
+          <div style="font-size:1.1rem;font-style:italic;color:var(--text);line-height:1.65;margin-bottom:1rem">"What decisions did people have to make in your research or practice context, and how could students experience those decisions safely?"</div>
+          <p style="font-size:.84rem;color:var(--text-muted)">That question is the engine of SPARC.</p>
+          <div style="margin-top:1.25rem">
+            <button class="btn btn-secondary btn-sm" onclick="navigate('scenario')">Try the scenario experience</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /page-contact -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATA: SCENARIOS
+═══════════════════════════════════════════════════════════ */
+const SCENARIOS = [
+  {
+    title: "Team Formation",
+    bestOption: "B",
+    bestExplanation: "Option B balances structure with speed. A short working preferences discussion creates enough shared understanding without consuming the entire preparation window. In high-stakes teams, some role clarity is always worth the investment.",
+    narrative: "Your interdisciplinary team has been assembled quickly. Members come from different disciplines and organisations. Some have Antarctic experience; others are technically strong but new to extreme environments. You have one preparation window before deployment planning begins.",
+    options: [
+      { label:"A", text:"Complete a structured team profile and discuss working preferences, stress responses, and role expectations.", effect:{time:-3,safety:4,energy:1}, consequence:"You lose preparation time, but gain role clarity and reduce hidden assumptions." },
+      { label:"B", text:"Run a short working preferences discussion and identify likely friction points.", effect:{time:-1,safety:2,energy:1}, consequence:"You create enough shared understanding to begin, though some assumptions remain." },
+      { label:"C", text:"Let people introduce themselves informally and move straight into task planning.", effect:{time:1,safety:0,energy:0}, consequence:"You preserve pace, but leave role expectations vague." },
+      { label:"D", text:"Skip team profiling. Everyone is a professional, so the work should speak for itself.", effect:{time:2,safety:-3,energy:-1}, consequence:"You move quickly, but the team carries invisible risks into the mission." }
+    ],
+    reflection: "How much structure does a team need before it becomes bureaucracy?"
+  },
+  {
+    title: "Mission Aim",
+    bestOption: "A",
+    bestExplanation: "Option A provides the clearest foundation for decision-making under pressure. Explicit stop/go criteria are especially important in extreme environments where the temptation to push on can override good judgement.",
+    narrative: "The science team wants ambitious data collection. Logistics staff warn that weather windows are narrow. Medical support asks for clearer thresholds for stopping work.",
+    options: [
+      { label:"A", text:"Define one primary aim, two secondary aims, and explicit stop/go criteria.", effect:{time:-2,safety:3,energy:1}, consequence:"The mission becomes clearer and safer, but planning takes time." },
+      { label:"B", text:"Keep the full ambition but rank tasks by priority.", effect:{time:-1,safety:1,energy:0}, consequence:"You maintain ambition with some structure, though pressure may return later." },
+      { label:"C", text:"Agree to decide priorities in the field once conditions are clearer.", effect:{time:1,safety:-1,energy:0}, consequence:"Flexibility is useful, but ambiguity may become expensive under pressure." },
+      { label:"D", text:"Push for maximum data collection while the team is deployed.", effect:{time:2,safety:-3,energy:-2}, consequence:"The plan looks productive on paper but may overload the team." }
+    ],
+    reflection: "When does ambition become a risk factor?"
+  },
+  {
+    title: "Communication Plan",
+    bestOption: "B",
+    bestExplanation: "Option B creates a workable rhythm without burdening the team. A daily briefing and debrief structure is light enough to sustain under pressure, yet disciplined enough to catch problems early. Formal escalation language can be added later if conditions demand it.",
+    narrative: "The team must agree how to communicate during fieldwork. Some prefer formal check-ins; others worry that too much process will slow them down.",
+    options: [
+      { label:"A", text:"Create a communication protocol with scheduled check-ins, escalation language, and closed-loop confirmation.", effect:{time:-2,safety:4,energy:0}, consequence:"Communication becomes disciplined, though some feel constrained." },
+      { label:"B", text:"Agree a simple daily briefing and debrief structure.", effect:{time:-1,safety:2,energy:1}, consequence:"The team has a workable rhythm without too much process." },
+      { label:"C", text:"Use informal communication and rely on professional judgement.", effect:{time:1,safety:-1,energy:0}, consequence:"It feels efficient until conditions become noisy or stressful." },
+      { label:"D", text:"Avoid formal communication plans because the group is experienced.", effect:{time:2,safety:-4,energy:-1}, consequence:"Expertise without shared communication can become a beautifully polished trapdoor." }
+    ],
+    reflection: "What communication routines protect teams when stress narrows attention?"
+  },
+  {
+    title: "Equipment Trade-Off",
+    bestOption: "C",
+    bestExplanation: "Option C keeps the mission lean and sustainable. In extreme environments, simplicity reduces failure points and preserves energy for the work that matters most. A cleaner protocol executed well outperforms an ambitious one that strains the team.",
+    narrative: "A technical specialist recommends carrying additional monitoring equipment. It may improve data quality but adds weight, complexity, and battery demands.",
+    options: [
+      { label:"A", text:"Carry the equipment and reduce the number of secondary data tasks.", effect:{time:-1,safety:1,energy:-1}, consequence:"You protect quality but accept extra load." },
+      { label:"B", text:"Pilot the equipment during preparation and decide based on reliability.", effect:{time:-2,safety:2,energy:0}, consequence:"You make a better decision, but testing costs time." },
+      { label:"C", text:"Carry only essential equipment and simplify the protocol.", effect:{time:1,safety:1,energy:2}, consequence:"The mission becomes leaner, but some data richness is lost." },
+      { label:"D", text:"Carry everything. Better to have it and not need it.", effect:{time:-2,safety:-2,energy:-3}, consequence:"The team becomes overburdened. The kit mountain has acquired its own weather system." }
+    ],
+    reflection: "What makes something 'essential' in an applied learning or fieldwork context?"
+  },
+  {
+    title: "Weather Window",
+    bestOption: "B",
+    bestExplanation: "Option B captures the opportunity without discarding safety. Completing critical checks only and reducing scope is the hallmark of experienced fieldwork decision-making: you move when the window opens, but you do not pretend readiness you do not have.",
+    narrative: "A narrow weather window appears earlier than expected. Starting now could save time, but the team has not completed all preparation checks.",
+    options: [
+      { label:"A", text:"Delay until all checks are complete.", effect:{time:-3,safety:4,energy:0}, consequence:"You protect safety but risk losing momentum." },
+      { label:"B", text:"Complete critical checks only and launch with reduced scope.", effect:{time:1,safety:1,energy:1}, consequence:"You balance opportunity with control." },
+      { label:"C", text:"Launch now and finish checks in the field.", effect:{time:3,safety:-3,energy:-1}, consequence:"You gain pace but export uncertainty into the field." },
+      { label:"D", text:"Launch immediately and keep the full plan.", effect:{time:4,safety:-5,energy:-2}, consequence:"Speed becomes seductive. Seduction rarely completes a risk assessment." }
+    ],
+    reflection: "What pressures make teams confuse urgency with importance?"
+  },
+  {
+    title: "Interdisciplinary Tension",
+    bestOption: "A",
+    bestExplanation: "Option A turns conflict into a design decision. Pausing to agree explicit thresholds using both science value and human risk criteria gives the whole team a shared framework for future calls. Interpersonal tension resolved early rarely returns; tension deferred almost always does.",
+    narrative: "A disagreement emerges. The medical lead wants conservative thresholds. The science lead argues that the mission will fail if the team stops too easily.",
+    options: [
+      { label:"A", text:"Pause and agree decision thresholds using both science value and human risk.", effect:{time:-2,safety:4,energy:1}, consequence:"Tension becomes useful data rather than interpersonal noise." },
+      { label:"B", text:"Ask each lead to state their non-negotiables and identify a compromise.", effect:{time:-1,safety:2,energy:0}, consequence:"You preserve relationships and clarify priorities." },
+      { label:"C", text:"Let the project lead make the call quickly.", effect:{time:1,safety:-1,energy:-1}, consequence:"Decision speed improves but ownership narrows." },
+      { label:"D", text:"Side with the science aim. The mission exists to collect data.", effect:{time:2,safety:-4,energy:-2}, consequence:"The team learns what is valued, and what is quietly expendable." }
+    ],
+    reflection: "How should teams handle conflict between mission success and human protection?"
+  },
+  {
+    title: "Fatigue Signals",
+    bestOption: "A",
+    bestExplanation: "Option A treats fatigue as a systemic signal rather than an individual failing. Activating a management plan and redistributing workload protects the whole team, normalises recovery as part of performance culture, and prevents a single person's decline from cascading into a mission-level problem.",
+    narrative: "After several demanding days, one team member becomes quieter and starts making small errors. They insist they are fine.",
+    options: [
+      { label:"A", text:"Activate a fatigue management plan and redistribute workload.", effect:{time:-2,safety:4,energy:2}, consequence:"You normalise recovery and protect the whole team." },
+      { label:"B", text:"Check in privately and reduce their task load for 24 hours.", effect:{time:-1,safety:2,energy:1}, consequence:"You respond proportionately, though the wider pattern may remain." },
+      { label:"C", text:"Monitor the situation but avoid making it a big issue.", effect:{time:1,safety:-2,energy:-1}, consequence:"You preserve flow, but risk waiting for a clearer failure." },
+      { label:"D", text:"Ignore it. Everyone is tired.", effect:{time:2,safety:-5,energy:-3}, consequence:"Fatigue is now driving the bus, and it has poor spatial awareness." }
+    ],
+    reflection: "What early signals should trigger action before performance visibly fails?"
+  },
+  {
+    title: "Data Loss",
+    bestOption: "B",
+    bestExplanation: "Option B is the pragmatic response under field conditions. Attempting partial recovery while adapting the collection plan preserves momentum and scientific value. Stopping completely costs too much time; repeating at full pace raids energy the team may not have. Adaptability is a core expedition competency.",
+    narrative: "A storage issue means part of the dataset may be corrupted. The team can attempt recovery, repeat the collection, or adjust the research question.",
+    options: [
+      { label:"A", text:"Stop, diagnose the issue, and protect remaining data before continuing.", effect:{time:-3,safety:1,energy:-1}, consequence:"You lose time but protect the integrity of the mission." },
+      { label:"B", text:"Attempt partial recovery and adapt the collection plan.", effect:{time:-1,safety:0,energy:1}, consequence:"You respond pragmatically and keep moving." },
+      { label:"C", text:"Continue collecting and hope enough data survives.", effect:{time:2,safety:-1,energy:-1}, consequence:"The plan feels efficient, but uncertainty compounds." },
+      { label:"D", text:"Repeat everything immediately at full pace.", effect:{time:-3,safety:-2,energy:-4}, consequence:"The team tries to rescue the science by raiding the energy cupboard." }
+    ],
+    reflection: "How should teams respond when the original plan becomes psychologically hard to let go?"
+  },
+  {
+    title: "External Pressure",
+    bestOption: "A",
+    bestExplanation: "Option A protects the primary mission while offering a genuine alternative. Declining for now and committing to a post-mission output is honest stakeholder management: it preserves goodwill without pretending the team has capacity it does not. Every 'yes' during a stretched deployment has a hidden cost.",
+    narrative: "A senior stakeholder asks whether the team can add a public engagement output while still in the field. It would be valuable, but the team is already stretched.",
+    options: [
+      { label:"A", text:"Decline for now and offer a post-mission output.", effect:{time:1,safety:2,energy:2}, consequence:"You protect mission focus and offer a realistic alternative." },
+      { label:"B", text:"Agree to a small, low-effort update with strict limits.", effect:{time:0,safety:0,energy:-1}, consequence:"You maintain goodwill with manageable cost." },
+      { label:"C", text:"Add the output and ask the team to absorb it.", effect:{time:-2,safety:-1,energy:-3}, consequence:"The request seems small until it lands on tired people." },
+      { label:"D", text:"Reframe it as essential impact work and make it a priority.", effect:{time:-3,safety:-2,energy:-4}, consequence:"The mission now has a side quest with teeth." }
+    ],
+    reflection: "How do teams protect focus when every extra task seems valuable?"
+  },
+  {
+    title: "Final Push",
+    bestOption: "B",
+    bestExplanation: "Option B captures additional value without ignoring the cost. A reduced final task with a strict time limit requires discipline, but it is the kind of structured decision that distinguishes experienced teams from those driven by momentum. The goal is not the most data — it is the most data the team can safely carry home.",
+    narrative: "The team is close to achieving the mission aim. A final opportunity appears to collect additional high-value data, but conditions are worsening.",
+    options: [
+      { label:"A", text:"Stop at the agreed threshold and preserve the team for safe exit.", effect:{time:-1,safety:4,energy:2}, consequence:"You respect the plan and protect recovery." },
+      { label:"B", text:"Complete a reduced final task within a strict time limit.", effect:{time:1,safety:0,energy:-1}, consequence:"You gain some value while containing risk." },
+      { label:"C", text:"Push for the full final collection because the opportunity is rare.", effect:{time:2,safety:-4,energy:-3}, consequence:"The team may gain data but pays for it in risk and fatigue." },
+      { label:"D", text:"Let the most motivated members continue while others prepare exit.", effect:{time:1,safety:-3,energy:-2}, consequence:"Splitting the team creates coordination and accountability risks." }
+    ],
+    reflection: "How do teams decide when 'one more push' is wisdom, ambition, or ego wearing a lab coat?"
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════
+   DATA: SLIDES
+═══════════════════════════════════════════════════════════ */
+function buildSlide(index) {
+  const s = SLIDE_DATA[index];
+  let html = `<div class="slide-number">Slide ${index+1} of ${SLIDE_DATA.length} — ${s.section}</div>`;
+  html += `<h2 class="slide-title">${s.title}</h2>`;
+  html += `<div class="slide-body">${s.body}</div>`;
+  if (s.cta) html += `<div class="slide-cta">${s.cta}</div>`;
+  return html;
+}
+
+const SLIDE_DATA = [
+  // 1
+  { section:"Session Opening", title:"From Research to Curriculum",
+    body:`<div class="slide-quote">Turning research into teaching that students experience, not just study.</div>
+    <p>The SPARC Framework for Scenario-Based Learning</p>
+    <p>Welcome to a session that will model the framework as you experience it, not just describe it from the outside.</p>`,
+    note:"Welcome delegates. Explain that the session itself will model the framework — they are about to experience scenario-based learning, not just hear about it." },
+
+  // 2
+  { section:"The Problem", title:"The problem: research does not automatically become learning",
+    body:`<ul class="slide-list">
+    <li>Academics often work with rich real-world partners in industry, defence, health, exploration, and beyond.</li>
+    <li>Those insights often enter teaching as examples, readings, or case studies.</li>
+    <li>Students may understand the content but never experience the decisions, uncertainty, or trade-offs that sit inside real-world practice.</li>
+    </ul>
+    <div class="slide-quote">Where does your research currently show up in your teaching?</div>`,
+    note:"Give delegates 60 seconds to think about this question. It surfaces where the gap is for them personally." },
+
+  // 3
+  { section:"The Reframe", title:"From content to experience",
+    body:`<div class="slide-quote">The key design question is not only "what should students know?" It is "what should students have to decide, practise, negotiate, or reflect on?"</div>
+    <div class="slide-mini-cards">
+    <div class="slide-mini">Knowledge</div>
+    <div class="slide-mini">Decision</div>
+    <div class="slide-mini">Reflection</div>
+    </div>
+    <p>This reframes research-led teaching as decision-led learning. The shift is small but the implications for design are significant.</p>`,
+    note:"This reframes research-led teaching as decision-led learning. Spend a moment on the three cards — they represent a shift in what counts as the core learning activity." },
+
+  // 4
+  { section:"Introducing SPARC", title:"The SPARC Framework",
+    body:`<p>SPARC is a practical design route for turning research partnerships into applied learning experiences.</p>
+    <div class="slide-chips">
+    <div class="slide-chip"><span class="n">S</span>Scenario Learning</div>
+    <div class="slide-chip"><span class="n">P</span>Partnership</div>
+    <div class="slide-chip"><span class="n">A</span>Application</div>
+    <div class="slide-chip"><span class="n">R</span>Reflection</div>
+    <div class="slide-chip"><span class="n">C</span>Curriculum</div>
+    </div>
+    <p>Each stage builds on the last. A good scenario needs a real context. Real contexts come from partnerships. Application requires structure. Structure enables reflection. Reflection feeds curriculum design.</p>`,
+    note:"Walk through each letter briefly. The point is not to memorise the acronym but to understand that each stage does different design work." },
+
+  // 5
+  { section:"S: Scenario Learning", title:"S — Scenario Learning",
+    body:`<div class="slide-quote">Students engage with realistic situations that mirror the complexity, ambiguity, and pressure of practice.</div>
+    <ul class="slide-list">
+    <li>Emergency planning and triage decisions</li>
+    <li>Expedition logistics under constraint</li>
+    <li>Ethical dilemmas with no clean answer</li>
+    <li>Team conflict and role ambiguity</li>
+    <li>Resource trade-offs in real time</li>
+    </ul>
+    <div class="slide-quote">What situation from your discipline contains genuine uncertainty or judgement?</div>`,
+    note:"This question is worth a brief pair discussion. Uncertainty and judgement are the key ingredients — if a scenario has a clear right answer it may not be doing much pedagogical work." },
+
+  // 6
+  { section:"P: Partnership", title:"P — Partnership",
+    body:`<div class="slide-quote">Partnerships provide the reality. They reveal the pressures, constraints, language, and consequences that make a learning activity authentic.</div>
+    <ul class="slide-list">
+    <li>Informed by applied work with the British Antarctic Survey Medical Unit</li>
+    <li>Defence and security contexts</li>
+    <li>Elite sport performance environments</li>
+    <li>Industry and sustainability partners</li>
+    <li>Community organisations and health services</li>
+    </ul>
+    <p style="font-size:.82rem;color:var(--text-muted);margin-top:.75rem">Note: partnerships inform the design without requiring partner endorsement of every activity. Phrase as "informed by applied work with…" where appropriate.</p>`,
+    note:"Reassure delegates that partnership does not mean formal co-authorship of every teaching activity. The partner provides the reality; the educator designs the learning." },
+
+  // 7
+  { section:"A: Application", title:"A — Application",
+    body:`<div class="slide-quote">Application means students use ideas, not just recall them.</div>
+    <ul class="slide-list">
+    <li>Make a decision with incomplete information</li>
+    <li>Interpret ambiguous data under time pressure</li>
+    <li>Negotiate competing priorities across roles</li>
+    <li>Allocate resources or responsibilities</li>
+    <li>Justify a plan and defend it to peers</li>
+    <li>Manage risk when consequences are visible</li>
+    </ul>
+    <div class="slide-quote">The strongest activities make students do the thinking that practitioners actually had to do.</div>`,
+    note:"The distinction between 'knowing about' and 'doing the thinking' is important here. Application is not just a task — it is the core learning mechanism." },
+
+  // 8
+  { section:"R + C", title:"R + C — Reflection into Curriculum",
+    body:`<p>Reflection turns activity into learning. Curriculum turns one good activity into a coherent teaching design.</p>
+    <div class="slide-rc-grid">
+    <div>
+    <h4>Reflection prompts</h4>
+    <ul class="slide-list">
+    <li>What did we notice?</li>
+    <li>What assumptions shaped our decisions?</li>
+    <li>What would we do differently?</li>
+    <li>What does this reveal about the theory?</li>
+    </ul>
+    </div>
+    <div>
+    <h4>Curriculum links</h4>
+    <ul class="slide-list">
+    <li>Learning outcomes and assessments</li>
+    <li>Skills development and employability</li>
+    <li>Research methods integration</li>
+    <li>Interdisciplinary learning</li>
+    </ul>
+    </div>
+    </div>`,
+    note:"Many scenario activities stop at the debrief. The C in SPARC pushes educators to ask: where does this live in the curriculum? How is it assessed? What comes before and after?" },
+
+  // 9
+  { section:"Mission Setup", title:"Scenario Experience: Antarctic Research Team",
+    body:`<div class="slide-quote">You are an interdisciplinary team preparing for a high-risk research deployment in Antarctica. Your goal is to design and protect a challenging research mission while maintaining safety, energy, and time.</div>
+    <p>The scenario is inspired by applied work with extreme-environment and expedition partners, including work connected to the British Antarctic Survey Medical Unit. It is designed as a teaching simulation, not a representation of any specific real mission.</p>
+    <p>You will face ten decisions. Each one affects three resources: <strong style="color:var(--ice)">Time</strong>, <strong style="color:var(--green)">Safety</strong>, and <strong style="color:var(--amber)">Energy</strong>. Start at 20. Keep the mission viable.</p>`,
+    cta:`<button class="btn btn-amber" onclick="navigate('scenario')">Launch Scenario Experience ›</button>`,
+    note:"Move to the Scenario Experience tab. Give teams 2 minutes to set up their team name and mission value before beginning the scenarios." },
+
+  // 10
+  { section:"The Partner Problem", title:"The partner problem",
+    body:`<div class="slide-quote">High-stakes fieldwork often brings together people from different disciplines, organisations, and professional cultures. Technical skill is essential, but it is rarely enough.</div>
+    <p>Teams also need:</p>
+    <ul class="slide-list">
+    <li>Shared mental models of the mission</li>
+    <li>Role clarity and decision authority</li>
+    <li>Communication discipline under pressure</li>
+    <li>Adaptability when conditions change</li>
+    <li>Collective risk awareness</li>
+    </ul>
+    <div class="slide-quote">How do we prepare interdisciplinary practitioners to work together on a difficult goal when conditions are uncertain and consequences matter?</div>`,
+    note:"This slide contextualises why the scenario involves an interdisciplinary team. The problems are not just technical — they are relational and communicative." },
+
+  // 11
+  { section:"Resources", title:"Your resources",
+    body:`<p>Three meters shape every decision your team makes:</p>
+    <div class="slide-chips" style="margin:1.2rem 0">
+    <div class="slide-chip" style="border-color:var(--ice-dim);color:var(--ice)">⏱ Time — starts at 20</div>
+    <div class="slide-chip" style="border-color:var(--green-dim);color:var(--green)">🛡 Safety — starts at 20</div>
+    <div class="slide-chip" style="border-color:var(--amber-dim);color:var(--amber)">⚡ Energy — starts at 20</div>
+    </div>
+    <div class="slide-quote">Your goal is not to maximise one score. Your goal is to keep the mission viable. A team that rushes but exhausts everyone has not succeeded. A team that is safe but runs out of time has not succeeded either.</div>`,
+    note:"Emphasise balance. Teams often optimise for one resource and neglect others. The post-scenario debrief is where you discuss what the pattern of choices reveals." },
+
+  // 12
+  { section:"How It Works", title:"How the experience works",
+    body:`<ul class="slide-list">
+    <li>Work as a team — discuss each scenario before choosing.</li>
+    <li>Read the scenario carefully.</li>
+    <li>Choose one option from A, B, C, or D.</li>
+    <li>Each choice affects Time, Safety, and Energy differently.</li>
+    <li>Discuss quickly, but notice how you decide.</li>
+    <li>After all ten scenarios, review your mission outcome.</li>
+    </ul>`,
+    note:"Encourage groups to notice who speaks first, who frames risk as urgent, who slows things down, and who stays quiet. These patterns are the real learning material." },
+
+  // 13
+  { section:"Debrief Lens", title:"What to notice",
+    body:`<p>Ask your team to pay attention as you go:</p>
+    <ul class="slide-list">
+    <li>Who led? Who challenged? Who stayed quiet?</li>
+    <li>What risks felt most urgent?</li>
+    <li>What did you sacrifice, and did you notice at the time?</li>
+    <li>Did your decisions reflect your stated mission value?</li>
+    <li>Did uncertainty produce better thinking or faster guessing?</li>
+    </ul>`,
+    note:"These questions become the debrief. You do not need to answer them during the scenario — just hold them." },
+
+  // 14
+  { section:"After the Mission", title:"After the mission",
+    body:`<div class="slide-quote">The real learning is not whether you 'win'. The learning is what your decisions reveal about communication, assumptions, leadership, risk, and reflection.</div>
+    <p>When your team has completed all ten scenarios, your mission outcome and debrief questions will appear on screen. You can download a summary for your team.</p>`,
+    cta:`<button class="btn btn-amber" onclick="navigate('scenario')">Continue to Scenario Experience ›</button>`,
+    note:"Teams should now have their outcome and scores on screen. Move to the debrief questions as a whole group." },
+
+  // 15
+  { section:"Post-Scenario", title:"What just happened?",
+    body:`<p>You just experienced:</p>
+    <ul class="slide-list">
+    <li>Uncertainty — the scenarios offered no clearly right answers.</li>
+    <li>Negotiation — decisions required discussion, not just knowledge.</li>
+    <li>Trade-offs — gaining one resource often cost another.</li>
+    <li>Consequences — choices had visible effects on the mission.</li>
+    <li>Material for reflection — you now have something concrete to examine.</li>
+    </ul>
+    <p style="margin-top:1rem">Map that back to SPARC:</p>
+    <div class="slide-chips">
+    <div class="slide-chip"><span class="n">S</span>Scenario</div>
+    <div class="slide-chip"><span class="n">P</span>Partnership</div>
+    <div class="slide-chip"><span class="n">A</span>Application</div>
+    <div class="slide-chip"><span class="n">R</span>Reflection</div>
+    <div class="slide-chip"><span class="n">C</span>Curriculum</div>
+    </div>`,
+    note:"This slide bridges the experience back to the framework. The point is that delegates have now lived through each stage — the framework is not abstract to them anymore." },
+
+  // 16
+  { section:"Reverse Engineering", title:"Reverse engineering the activity",
+    body:`<img src="./Xcube.png" alt="Xcube scenario visualisation" class="slide-img">
+    <ul class="slide-list">
+    <li><strong style="color:var(--text)">Scenario:</strong> An interdisciplinary Antarctic research team under resource pressure.</li>
+    <li><strong style="color:var(--text)">Partnership:</strong> Informed by extreme-environment research and medical support contexts, including work connected to Antarctic expedition environments.</li>
+    <li><strong style="color:var(--text)">Application:</strong> Decisions under uncertainty, with visible trade-offs.</li>
+    <li><strong style="color:var(--text)">Reflection:</strong> Team dynamics, communication, risk framing, and resource management.</li>
+    <li><strong style="color:var(--text)">Curriculum:</strong> Adaptable to modules in leadership, decision-making, professional practice, or research methods.</li>
+    </ul>` },
+
+  // 17
+  { section:"Design Your Own", title:"Design your own SPARC activity",
+    body:`<p style="margin-bottom:1rem">Use this as a quick planning prompt. Notes saved here are for the session only.</p>
+    <div class="slide-design-form">
+    <div><label>What research, partnership, or practice context could you use?</label><textarea id="sd_context" oninput="saveSd(this)" placeholder="e.g. A clinical placement partnership, a community research project, a defence collaboration…" rows="2"></textarea></div>
+    <div><label>What scenario would students enter?</label><textarea id="sd_scenario" oninput="saveSd(this)" placeholder="e.g. They are a triage team, a policy team, a design sprint group…" rows="2"></textarea></div>
+    <div><label>What decision would they have to make?</label><textarea id="sd_decision" oninput="saveSd(this)" placeholder="e.g. Prioritise which patients to treat, allocate a limited budget, choose between two policy options…" rows="2"></textarea></div>
+    <div><label>What resources, constraints, or pressures would shape the task?</label><textarea id="sd_constraints" oninput="saveSd(this)" placeholder="e.g. Time pressure, incomplete data, competing professional roles…" rows="2"></textarea></div>
+    <div><label>What reflection question would make the learning visible?</label><textarea id="sd_reflect" oninput="saveSd(this)" placeholder="e.g. What did you assume? What would change if you knew more?" rows="2"></textarea></div>
+    <div><label>Where could this sit in your curriculum?</label><textarea id="sd_curriculum" oninput="saveSd(this)" placeholder="e.g. Week 6 of a leadership module, as a formative assessment, as an induction activity…" rows="2"></textarea></div>
+    </div>`,
+    note:"Give delegates 5–8 minutes for this. Then ask two or three to share. The debrief of their ideas is itself a modelling of the R stage." },
+
+  // 18
+  { section:"Share and Adapt", title:"Share and adapt",
+    body:`<div class="slide-quote">In pairs or small groups, share one SPARC idea and identify one risk: what could make the activity confusing, superficial, or difficult to assess?</div>
+    <p>Three common design risks to watch for:</p>
+    <div class="slide-mini-cards">
+    <div class="slide-mini" style="font-size:.82rem;font-weight:400;color:var(--text-muted);line-height:1.4"><strong style="color:var(--amber);display:block;margin-bottom:.3rem">Too much story</strong>not enough learning</div>
+    <div class="slide-mini" style="font-size:.82rem;font-weight:400;color:var(--text-muted);line-height:1.4"><strong style="color:var(--amber);display:block;margin-bottom:.3rem">Too much complexity</strong>not enough structure</div>
+    <div class="slide-mini" style="font-size:.82rem;font-weight:400;color:var(--text-muted);line-height:1.4"><strong style="color:var(--amber);display:block;margin-bottom:.3rem">Too much activity</strong>not enough reflection</div>
+    </div>`,
+    note:"These three risks come up regularly in scenario design. They are worth naming explicitly because they are easy traps to fall into, especially when the scenario narrative is engaging." },
+
+  // 19
+  { section:"Design Principles", title:"Three design principles",
+    body:`<ul class="slide-list" style="gap:.85rem">
+    <li style="font-size:1rem"><strong style="color:var(--text)">Teach the decisions practitioners faced, not just the findings they produced.</strong> The most powerful learning comes from experiencing the judgement calls, not arriving at the conclusions.</li>
+    <li style="font-size:1rem"><strong style="color:var(--text)">Simulate the quality of thinking required, not every detail of the environment.</strong> A scenario does not need technical perfection. It needs to activate the right kind of cognitive and social work.</li>
+    <li style="font-size:1rem"><strong style="color:var(--text)">End every scenario with structured reflection, because that is where the curriculum lives.</strong> An activity without reflection is just an experience. Reflection is what makes it a lesson.</li>
+    </ul>` },
+
+  // 20
+  { section:"Closing", title:"The SPARC question",
+    body:`<div class="slide-quote" style="font-size:1.1rem;padding:1.5rem 1.75rem">What decisions did people have to make in your research or practice context, and how could students experience those decisions safely?</div>
+    <p style="text-align:center;margin-top:.75rem;color:var(--text-muted)">That question is the engine of SPARC.</p>
+    <div style="margin-top:1.5rem">
+    <div class="label-chip" style="margin-bottom:.9rem">Learning outcomes: achieved</div>
+    <ul class="slide-list" style="gap:.5rem">
+    <li><span style="color:var(--green);font-weight:700;margin-right:.3rem">1.</span>You explored how research partnerships inform curriculum design through the SPARC framework and partner examples.</li>
+    <li><span style="color:var(--green);font-weight:700;margin-right:.3rem">2.</span>You described all five stages: Scenario Learning, Partnership, Application, Reflection, and Curriculum.</li>
+    <li><span style="color:var(--green);font-weight:700;margin-right:.3rem">3.</span>You experienced scenario-based learning directly through the Antarctic mission.</li>
+    <li><span style="color:var(--green);font-weight:700;margin-right:.3rem">4.</span>You saw how uncertainty, risk, and team dynamics became constructive learning material.</li>
+    <li><span style="color:var(--green);font-weight:700;margin-right:.3rem">5.</span>You drafted your own SPARC idea in the design worksheet.</li>
+    </ul>
+    <div style="margin-top:1.25rem;padding:1rem 1.1rem;background:rgba(91,196,240,.06);border:1px solid var(--ice-dim);border-radius:8px">
+    <div style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ice);margin-bottom:.4rem">What's next</div>
+    <p style="font-size:.88rem;color:var(--text-sub);line-height:1.6">You can build your own full SPARC scenario experience using an AI assistant such as Claude. Use the notes and AI prompt included in your session download, or open Visual Studio Code, start a new project, and ask Claude to generate a complete interactive scenario from your context. The full game structure, scoring logic, and ten scenarios can be produced in minutes.</p>
+    </div>
+    </div>`,
+    cta:`<button class="btn btn-primary" onclick="downloadSparcMd()">Download your SPARC prompt (.md) ↓</button><button class="btn btn-secondary" onclick="navigate('contact')">Contact / Impact ›</button><button class="btn btn-ghost" onclick="navigate('home')">Return to home</button>` }
+];
+
+/* ═══════════════════════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════════════════════ */
+const TEAM_NAMES = ['Ice Core Collective','The Calibration Crew','Polar Pragmatists','The Whiteout Working Group','The Frostline Faculty','The Shackleton Spreadsheet Society','The Risky Penguins'];
+
+let APP = {
+  page: 'home',
+  slideIndex: 0,
+  notesVisible: false,
+  phase: 'setup',     // 'setup' | 'playing' | 'debrief'
+  scenarioIndex: 0,
+  chosenOption: null, // null | 0-3
+  showingResult: false,
+  team: { name:'', members:'', value:'' },
+  scores: { time:20, safety:20, energy:20 },
+  choices: []         // [{option, effect, scenario}]
+};
+
+function loadApp() {
+  try {
+    const s = JSON.parse(localStorage.getItem('sparc_app')||'null');
+    if (s) Object.assign(APP, s);
+  } catch(e) {}
+}
+
+function saveApp() {
+  try { localStorage.setItem('sparc_app', JSON.stringify(APP)); } catch(e) {}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════ */
+function fadeImgs(container) {
+  if (!container) return;
+  const imgs = [...container.querySelectorAll('.asset-img,.setup-img,.slide-img,.profile-img,.plym-logo,.looks-cold-img')];
+  imgs.forEach(img => { img.style.transition = 'none'; img.style.opacity = '0'; img.style.transform = 'scale(1.03)'; });
+  requestAnimationFrame(() => {
+    imgs.forEach((img, i) => {
+      setTimeout(() => {
+        img.style.transition = 'opacity .65s ease, transform .65s ease';
+        img.style.opacity = '1';
+        img.style.transform = 'scale(1)';
+      }, 60 + i * 90);
+    });
+  });
+}
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+  const el = document.getElementById('page-'+page);
+  if (el) { el.classList.add('active'); window.scrollTo(0,0); }
+  APP.page = page;
+  if (page === 'scenario') renderScenario();
+  if (page === 'teaching') { renderSlide(APP.slideIndex, 0); }
+  saveApp();
+  fadeImgs(document.getElementById('page-'+page));
+}
+
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SLIDE DECK
+═══════════════════════════════════════════════════════════ */
+function renderSlide(index, dir) {
+  const card = document.getElementById('slideCard');
+  card.innerHTML = buildSlide(index);
+  card.className = 'slide-card' + (dir > 0 ? ' slide-r' : dir < 0 ? ' slide-l' : '');
+
+  document.getElementById('slideCounter').textContent = `Slide ${index+1} of ${SLIDE_DATA.length}`;
+  document.getElementById('progressFill').style.width = ((index+1)/SLIDE_DATA.length*100)+'%';
+  document.getElementById('slidePrev').disabled = index === 0;
+  document.getElementById('slideNext').disabled = index === SLIDE_DATA.length - 1;
+  APP.slideIndex = index;
+  saveApp();
+  fadeImgs(card);
+  if (index === 16) setTimeout(loadSd, 0);
+}
+
+function goSlide(dir) {
+  const n = APP.slideIndex + dir;
+  if (n < 0 || n >= SLIDE_DATA.length) return;
+  renderSlide(n, dir);
+}
+
+function jumpSlide(index) {
+  const dir = index > APP.slideIndex ? 1 : -1;
+  renderSlide(index, dir);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCENARIO RENDERING
+═══════════════════════════════════════════════════════════ */
+function renderScenario() {
+  if (APP.phase === 'setup')  renderSetup();
+  if (APP.phase === 'playing') renderPlaying();
+  if (APP.phase === 'debrief') renderDebrief();
+}
+
+/* ── Setup screen ── */
+function renderSetup() {
+  const w = document.getElementById('sceneWrap');
+  w.innerHTML = `
+  <div class="setup-box">
+    <img src="./Looks_Cold.png" alt="Antarctic field conditions" class="setup-img" onerror="this.style.display='none'">
+    <div class="setup-hero">
+      <h1>Antarctic Research Mission</h1>
+      <p>You are part of an interdisciplinary research team preparing for a high-risk Antarctic field deployment. Your mission is to collect critical scientific data while protecting people, time, and operational energy in a remote and unpredictable environment.</p>
+    </div>
+    <div class="depth-card">
+      <div class="depth-item"><span class="depth-lbl">Location</span><span class="depth-val">Queen Maud Land, East Antarctica</span></div>
+      <div class="depth-item"><span class="depth-lbl">Temperature</span><span class="depth-val">−22°C to −38°C (wind chill factor applied)</span></div>
+      <div class="depth-item"><span class="depth-lbl">Duration</span><span class="depth-val">14-day deployment, 10 critical decision windows</span></div>
+    </div>
+    <div class="how-it-works">
+      <div class="hiw-title">How it works</div>
+      <div class="hiw-steps">
+        <div class="hiw-step"><span class="hiw-n">1</span><span>Name your team and choose a mission value that will guide your decisions.</span></div>
+        <div class="hiw-step"><span class="hiw-n">2</span><span>You will face ten scenarios drawn from real expedition decision-making. Each one has no single correct answer.</span></div>
+        <div class="hiw-step"><span class="hiw-n">3</span><span>Every choice affects three resources: <strong style="color:var(--ice)">Time</strong>, <strong style="color:var(--green)">Safety</strong>, and <strong style="color:var(--amber)">Energy</strong>. All start at 20. None can exceed 30 or fall below 0.</span></div>
+        <div class="hiw-step"><span class="hiw-n">4</span><span>After the final scenario, your mission outcome and a full debrief review will appear — including which options were most defensible and why.</span></div>
+      </div>
+    </div>
+    <div class="basmu-note">Inspired by applied work with extreme-environment and expedition partners, including work connected to the British Antarctic Survey Medical Unit. Designed as a teaching simulation, not a representation of any specific real mission.</div>
+    <div class="form-field">
+      <label class="form-label">Team name <span style="color:var(--text-muted);font-weight:400">(or leave blank for a generated name)</span></label>
+      <input class="form-input" id="teamName" placeholder="Your team name…" value="${APP.team.name}">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Team members <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+      <textarea class="form-textarea" id="teamMembers" placeholder="Names or roles…">${APP.team.members}</textarea>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Mission value</label>
+      <select class="form-select" id="missionValue">
+        <option value="">Choose a mission value…</option>
+        <option value="Safety first" ${APP.team.value==='Safety first'?'selected':''}>Safety first</option>
+        <option value="Science first" ${APP.team.value==='Science first'?'selected':''}>Science first</option>
+        <option value="Team first" ${APP.team.value==='Team first'?'selected':''}>Team first</option>
+        <option value="Adaptability" ${APP.team.value==='Adaptability'?'selected':''}>Adaptability</option>
+        <option value="Efficiency" ${APP.team.value==='Efficiency'?'selected':''}>Efficiency</option>
+        <option value="Learning under pressure" ${APP.team.value==='Learning under pressure'?'selected':''}>Learning under pressure</option>
+      </select>
+      <div class="form-hint">Your declared value will appear in the debrief summary.</div>
+    </div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem">
+      <button class="btn btn-primary" onclick="startMission()" style="flex:1;min-width:180px;justify-content:center">Begin mission ›</button>
+      <button class="btn btn-ghost" onclick="navigate('teaching')">← Back to slides</button>
+    </div>
+  </div>`;
+}
+
+/* ── Start mission ── */
+function startMission() {
+  let name = document.getElementById('teamName').value.trim();
+  if (!name) name = TEAM_NAMES[Math.floor(Math.random()*TEAM_NAMES.length)];
+  APP.team.name = name;
+  APP.team.members = document.getElementById('teamMembers').value.trim();
+  APP.team.value = document.getElementById('missionValue').value;
+  APP.phase = 'playing';
+  APP.scenarioIndex = 0;
+  APP.scores = { time:20, safety:20, energy:20 };
+  APP.choices = [];
+  APP.chosenOption = null;
+  APP.showingResult = false;
+  saveApp();
+  renderPlaying();
+}
+
+/* ── Playing screen ── */
+function renderPlaying() {
+  const w = document.getElementById('sceneWrap');
+  const sc = SCENARIOS[APP.scenarioIndex];
+
+  // Progress dots
+  let dots = '';
+  for (let i = 0; i < SCENARIOS.length; i++) {
+    let cls = 'scene-dot';
+    if (i < APP.scenarioIndex) cls += ' done';
+    else if (i === APP.scenarioIndex) cls += ' current';
+    dots += `<div class="${cls}"></div>`;
+  }
+
+  // Resource bars
+  function bar(r, label) {
+    const v = APP.scores[r];
+    const pct = (v/30*100).toFixed(1);
+    const low = v <= 5 ? ' low' : '';
+    return `<div class="resource-item" id="res_${r}">
+      <div class="res-label">${label}</div>
+      <div class="res-track"><div class="res-fill ${r}${low}" id="fill_${r}" style="width:${pct}%"></div></div>
+      <div class="res-val ${r}${low}" id="val_${r}">${v}</div>
+    </div>`;
+  }
+
+  // Build options
+  let optHtml = '';
+  sc.options.forEach((opt, i) => {
+    let cls = 'choice';
+    if (APP.showingResult) {
+      cls += APP.chosenOption === i ? ' selected locked' : ' dismissed locked';
+    }
+    optHtml += `<div class="${cls}" onclick="selectOption(${i})">
+      <div class="choice-ltr">${opt.label}</div>
+      <div class="choice-text">${opt.text}</div>
+    </div>`;
+  });
+
+  // Consequence panel (shown after selection)
+  let resultHtml = '';
+  if (APP.showingResult) {
+    const chosen = sc.options[APP.chosenOption];
+    resultHtml = `
+    <div class="consequence-panel" id="resultPanel">
+      <div class="cons-title">Consequence</div>
+      <div class="cons-text">${chosen.consequence}</div>
+      <div class="reflect-box">
+        <div class="reflect-lbl">Reflection prompt</div>
+        <div class="reflect-text">${sc.reflection}</div>
+      </div>
+    </div>`;
+  }
+
+  // Next / finish button
+  let nextHtml = '';
+  if (APP.showingResult) {
+    const isLast = APP.scenarioIndex === SCENARIOS.length - 1;
+    nextHtml = `<div class="next-btn-row">
+      <button class="btn btn-primary" onclick="${isLast ? 'finishMission()' : 'nextScenario()'}">
+        ${isLast ? 'View mission outcome ›' : `Next scenario (${APP.scenarioIndex + 2} of ${SCENARIOS.length}) ›`}
+      </button>
+    </div>`;
+  }
+
+  w.innerHTML = `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+    <div style="font-size:.82rem;color:var(--text-muted)">Team: <strong style="color:var(--text)">${APP.team.name}</strong>${APP.team.value ? ` &nbsp;·&nbsp; Value: <em>${APP.team.value}</em>` : ''}</div>
+    <button class="btn btn-danger btn-sm" onclick="confirmReset()">Reset mission</button>
+  </div>
+  <div class="resource-panel">
+    <div class="resource-row">
+      ${bar('time','Time')}${bar('safety','Safety')}${bar('energy','Energy')}
+    </div>
+  </div>
+  <div class="scene-progress">${dots}<span class="scene-progress-label">Scenario ${APP.scenarioIndex+1} of ${SCENARIOS.length}</span></div>
+  <div class="scene-header">
+    <div class="scene-label">Scenario ${APP.scenarioIndex+1} — Antarctic Research Mission</div>
+    <div class="scene-title">${sc.title}</div>
+  </div>
+  <div class="scene-narrative">${sc.narrative}</div>
+  <div class="choices">${optHtml}</div>
+  ${resultHtml}
+  ${nextHtml}`;
+}
+
+/* ── Select option ── */
+function selectOption(i) {
+  if (APP.showingResult) return;
+  APP.chosenOption = i;
+  APP.showingResult = true;
+
+  const sc = SCENARIOS[APP.scenarioIndex];
+  const effect = sc.options[i].effect;
+
+  // Save choice
+  APP.choices.push({ scenario: APP.scenarioIndex, option: sc.options[i].label, effect });
+
+  // Apply effect with clamp
+  const prev = { ...APP.scores };
+  APP.scores.time   = Math.max(0, Math.min(30, APP.scores.time   + effect.time));
+  APP.scores.safety = Math.max(0, Math.min(30, APP.scores.safety + effect.safety));
+  APP.scores.energy = Math.max(0, Math.min(30, APP.scores.energy + effect.energy));
+
+  saveApp();
+  renderPlaying();
+
+  // Animate score floats
+  setTimeout(() => {
+    ['time','safety','energy'].forEach(r => {
+      const delta = APP.scores[r] - prev[r];
+      if (delta === 0) return;
+      const track = document.getElementById('res_'+r);
+      if (!track) return;
+      const el = document.createElement('div');
+      el.className = 'score-float ' + (delta > 0 ? 'pos' : 'neg');
+      el.textContent = delta > 0 ? '+'+delta : ''+delta;
+      track.style.position = 'relative';
+      track.appendChild(el);
+      setTimeout(() => el.remove(), 1400);
+    });
+  }, 50);
+}
+
+function nextScenario() {
+  APP.scenarioIndex++;
+  APP.chosenOption = null;
+  APP.showingResult = false;
+  saveApp();
+  renderPlaying();
+}
+
+function finishMission() {
+  APP.phase = 'debrief';
+  saveApp();
+  renderDebrief();
+}
+
+/* ── Debrief screen ── */
+function renderDebrief() {
+  const w = document.getElementById('sceneWrap');
+  const { time, safety, energy } = APP.scores;
+  const outcome = calcOutcome();
+  const vuln = calcVuln();
+  const titles = { excellent:'Excellent Mission Readiness', viable:'Viable but Stretched', fragile:'Fragile Mission', serious:'Mission at Serious Risk' };
+  const descs = {
+    excellent:'Your team maintained a strong balance between progress, protection, and energy. You did not avoid trade-offs, but you managed them deliberately.',
+    viable:'Your mission remains viable, but pressure is showing. One or more areas will need active management before deployment.',
+    fragile:'The mission is still possible, but resilience is thin. Your decisions created vulnerabilities that would need urgent attention.',
+    serious:'The mission is at serious risk. The issue is not one bad decision, but the accumulation of trade-offs without enough recovery, clarity, or protection.'
+  };
+
+  // Score gauge helper
+  function gauge(r, val, label) {
+    const pct = (val/30*100).toFixed(1);
+    const low = val <= 5 ? ' low' : '';
+    return `<div class="fs-card">
+      <div class="fs-label">${label}</div>
+      <div class="fs-value ${r}${low}" id="fs_${r}">${val}</div>
+      <div class="fs-bar-track"><div class="fs-bar-fill ${r}" id="fsf_${r}" style="width:0%"></div></div>
+    </div>`;
+  }
+
+  // Choices summary with revealed effects and best-option callout
+  let choiceRows = APP.choices.map((c, i) => {
+    const sc = SCENARIOS[i];
+    const chosen = sc.options.find(o => o.label === c.option);
+    const isBest = sc.bestOption && c.option === sc.bestOption;
+    const effectPills = ['time','safety','energy'].map(r => {
+      const v = chosen.effect[r];
+      if (v === 0) return '';
+      const cls2 = v > 0 ? 'pos' : 'neg';
+      const lbl = r === 'time' ? 'Time' : r === 'safety' ? 'Safety' : 'Energy';
+      return `<span class="pill ${cls2}">${v > 0 ? '+' : ''}${v} ${lbl}</span>`;
+    }).join('');
+    const bestCallout = sc.bestOption ? (isBest
+      ? `<div class="best-callout best-hit"><span class="best-icon">★</span> Best choice</div>`
+      : `<div class="best-callout best-miss"><span class="best-icon">→</span> Suggested best: <strong>Option ${sc.bestOption}</strong> — ${sc.bestExplanation}</div>`)
+      : '';
+    return `<div class="choice-row">
+      <div class="cr-top">
+        <div class="cr-num">${i+1}</div>
+        <div class="cr-ltr">${c.option}</div>
+        <div class="cr-text"><strong>${sc.title}</strong><br><span style="color:var(--text-sub);font-size:.88rem">${chosen.text}</span></div>
+      </div>
+      ${effectPills ? `<div class="cr-effects effect-pills" style="margin:.4rem 0 .3rem 2.8rem">${effectPills}</div>` : ''}
+      ${bestCallout}
+    </div>`;
+  }).join('');
+
+  const dqs = ['What did your team protect most: time, safety, or energy?','What did your team sacrifice most?','Who shaped the decisions?','Where did you confuse confidence with readiness?','Which decision felt most realistic?','What would this activity help students understand?','How could this be adapted to your discipline?'];
+
+  w.innerHTML = `
+  <div class="debrief">
+    <div class="outcome-banner ${outcome}">
+      <div class="team-tag">${APP.team.name}</div>
+      <div class="outcome-cat ${outcome}">${titles[outcome]}</div>
+      <div class="outcome-title">${titles[outcome]}</div>
+      <div class="outcome-desc">${descs[outcome]}</div>
+      <div class="outcome-vuln">${vuln}</div>
+    </div>
+    <div class="final-scores">
+      ${gauge('time', time, 'Time')}
+      ${gauge('safety', safety, 'Safety')}
+      ${gauge('energy', energy, 'Energy')}
+    </div>
+    <div class="choices-accordion" id="choicesAcc">
+      <div class="acc-head" onclick="toggleAcc()">
+        <strong>Your choices (${APP.choices.length} scenarios)</strong>
+        <span class="acc-arrow">▾</span>
+      </div>
+      <div class="acc-body">${choiceRows}</div>
+    </div>
+    <div class="debrief-qs">
+      <div class="label-chip" style="margin-bottom:1rem">Debrief questions</div>
+      ${dqs.map((q,i)=>`<div class="dq"><span class="dq-n">${i+1}.</span><span>${q}</span></div>`).join('')}
+    </div>
+    <div class="debrief-actions">
+      <button class="btn btn-primary" onclick="downloadDebrief()">Download debrief ↓</button>
+      <button class="btn btn-ghost" onclick="window.print()">Print summary</button>
+      <button class="btn btn-danger" onclick="confirmReset()">Reset mission</button>
+    </div>
+  </div>`;
+
+  // Animate score bars after render
+  setTimeout(() => {
+    ['time','safety','energy'].forEach(r => {
+      const fill = document.getElementById('fsf_'+r);
+      if (fill) fill.style.width = (APP.scores[r]/30*100)+'%';
+    });
+  }, 150);
+
+  // Confetti for excellent
+  if (outcome === 'excellent') setTimeout(launchConfetti, 400);
+}
+
+function toggleAcc() {
+  document.getElementById('choicesAcc').classList.toggle('open');
+}
+
+function calcOutcome() {
+  const { time, safety, energy } = APP.scores;
+  const all = [time, safety, energy];
+  if (all.every(s => s >= 16)) return 'excellent';
+  if (all.every(s => s >= 10)) return 'viable';
+  if (Math.min(...all) >= 6)   return 'fragile';
+  return 'serious';
+}
+
+function calcVuln() {
+  const { time, safety, energy } = APP.scores;
+  const min = Math.min(time, safety, energy);
+  if (time === min) return 'Your main vulnerability was pace and operational planning.';
+  if (safety === min) return 'Your main vulnerability was risk control and protection.';
+  return 'Your main vulnerability was workload, morale, and cognitive capacity.';
+}
+
+function confirmReset() {
+  if (confirm('Reset the mission? All scores and choices will be cleared.')) {
+    APP.phase = 'setup';
+    APP.scenarioIndex = 0;
+    APP.chosenOption = null;
+    APP.showingResult = false;
+    APP.scores = { time:20, safety:20, energy:20 };
+    APP.choices = [];
+    APP.team = { name:'', members:'', value:'' };
+    saveApp();
+    renderSetup();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DOWNLOAD DEBRIEF
+═══════════════════════════════════════════════════════════ */
+function downloadDebrief() {
+  const outcome = calcOutcome();
+  const titles = { excellent:'Excellent Mission Readiness', viable:'Viable but Stretched', fragile:'Fragile Mission', serious:'Mission at Serious Risk' };
+  let txt = `SPARC FOR EDUCATION — MISSION DEBRIEF\n${'═'.repeat(44)}\n\n`;
+  txt += `Team: ${APP.team.name}\n`;
+  txt += `Members: ${APP.team.members || 'Not recorded'}\n`;
+  txt += `Mission value: ${APP.team.value || 'Not selected'}\n\n`;
+  txt += `FINAL SCORES\nTime: ${APP.scores.time}/30  |  Safety: ${APP.scores.safety}/30  |  Energy: ${APP.scores.energy}/30\n\n`;
+  txt += `MISSION OUTCOME: ${titles[outcome]}\n${calcVuln()}\n\n`;
+  txt += `CHOICES MADE\n`;
+  APP.choices.forEach((c, i) => {
+    const sc = SCENARIOS[i];
+    txt += `Scenario ${i+1} — ${sc.title}: Option ${c.option}\n`;
+    txt += `  "${sc.options.find(o=>o.label===c.option).text}"\n`;
+    txt += `  Effect: Time ${c.effect.time>=0?'+':''}${c.effect.time}, Safety ${c.effect.safety>=0?'+':''}${c.effect.safety}, Energy ${c.effect.energy>=0?'+':''}${c.effect.energy}\n\n`;
+  });
+  txt += `DEBRIEF QUESTIONS\n`;
+  ['What did your team protect most: time, safety, or energy?','What did your team sacrifice most?','Who shaped the decisions?','Where did you confuse confidence with readiness?','Which decision felt most realistic?','What would this activity help students understand?','How could this be adapted to your discipline?'].forEach((q,i) => {
+    txt += `${i+1}. ${q}\n\n\n`;
+  });
+  txt += `\nGenerated by SPARC for Education\nDr Jonathan Rhodes, University of Plymouth\njonathan.rhodes@plymouth.ac.uk\n`;
+
+  const blob = new Blob([txt], { type:'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `SPARC_Debrief_${APP.team.name.replace(/\s+/g,'_')}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   IMAGE UPLOADS
+═══════════════════════════════════════════════════════════ */
+function handleImg(i, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const src = ev.target.result;
+    document.getElementById('imgPreview_'+i).innerHTML = `<img src="${src}" alt="Session image">`;
+    try { localStorage.setItem('sparc_img_'+i, src); } catch(e) {}
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveCaption(i, val) {
+  try { localStorage.setItem('sparc_cap_'+i, val); } catch(e) {}
+}
+
+function loadImages() {
+  for (let i = 0; i < 3; i++) {
+    try {
+      const src = localStorage.getItem('sparc_img_'+i);
+      const cap = localStorage.getItem('sparc_cap_'+i);
+      if (src) document.getElementById('imgPreview_'+i).innerHTML = `<img src="${src}" alt="Session image">`;
+      if (cap) document.getElementById('imgCaption_'+i).value = cap;
+    } catch(e) {}
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COPY SPARC
+═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   SLIDE 17 DESIGN WORKSHEET — save / load / download
+═══════════════════════════════════════════════════════════ */
+const SD_KEYS = ['sd_context','sd_scenario','sd_decision','sd_constraints','sd_reflect','sd_curriculum'];
+
+function saveSd(el) {
+  try { localStorage.setItem('sparc_'+el.id, el.value); } catch(e) {}
+}
+
+function loadSd() {
+  SD_KEYS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = localStorage.getItem('sparc_'+id);
+    if (val) el.value = val;
+  });
+}
+
+function getSd(id) {
+  const el = document.getElementById(id);
+  if (el && el.value.trim()) return el.value.trim();
+  return (localStorage.getItem('sparc_'+id) || '').trim();
+}
+
+function downloadSparcMd() {
+  const ctx        = getSd('sd_context')     || '[not filled in]';
+  const scenario   = getSd('sd_scenario')    || '[not filled in]';
+  const decision   = getSd('sd_decision')    || '[not filled in]';
+  const constraints= getSd('sd_constraints') || '[not filled in]';
+  const reflect    = getSd('sd_reflect')     || '[not filled in]';
+  const curriculum = getSd('sd_curriculum')  || '[not filled in]';
+  const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  const md = `# My SPARC Design + Claude Build Prompt
+*Generated from SPARC for Education — Dr Jonathan Rhodes, University of Plymouth*
+*Date: ${today}*
+
+---
+
+## Part 1: My SPARC Design Worksheet
+
+**Research / partnership context**
+${ctx}
+
+**Scenario students will enter**
+${scenario}
+
+**Decision students will have to make**
+${decision}
+
+**Resources, constraints, and pressures that shape the task**
+${constraints}
+
+**Reflection question that makes the learning visible**
+${reflect}
+
+**Where this could sit in the curriculum**
+${curriculum}
+
+---
+
+## Part 2: Claude Build Prompt
+
+> Copy everything from this heading to the end of the document and paste it into Claude (claude.ai) or into the Claude extension in Visual Studio Code as your first message. You can add or change anything — this is a starting point, not a script.
+
+---
+
+# Build prompt: Custom SPARC Scenario Experience
+
+I want you to build me a complete, single-file interactive web application for scenario-based teaching, based on the SPARC Framework (Scenario Learning, Partnership, Application, Reflection, Curriculum). The file should be a single \`index.html\` with all CSS and JavaScript included inline. No external libraries, no build tools, no frameworks.
+
+## My context
+
+**Research or practice context I am drawing from:**
+${ctx}
+
+**Scenario students will enter:**
+${scenario}
+
+**Core decision students must make:**
+${decision}
+
+**Resources, constraints, and pressures that shape the task:**
+${constraints}
+
+**Reflection question that ends each scenario:**
+${reflect}
+
+**Where this sits in my curriculum:**
+${curriculum}
+
+## Architecture
+
+- One \`index.html\` file — all HTML, CSS, and JavaScript inline, nothing external.
+- Four pages navigated by tab bar: Home, Teaching Slides, Scenario Experience, About.
+- \`localStorage\` persists all game state, team name, choices, and design notes across refreshes.
+- Works offline. Deployable to GitHub Pages with no build step.
+
+## Visual design
+
+- Dark navy background (#040d1a or similar).
+- Choose an accent colour appropriate to my context above. Use it consistently as a CSS custom property (\`--accent\`).
+- CSS custom properties for the full colour palette, border radii, and spacing.
+- Animated particle canvas background on all pages (subtle drifting dots, no performance impact).
+- Clean sans-serif typography (system font stack).
+- Smooth CSS animations for page transitions (\`fadeUp\`, \`pageIn\`).
+- Responsive — works on mobile (320px) and desktop (1200px+).
+
+## Pages
+
+### 1. Home
+- Large animated title (the name of my scenario experience).
+- One-line subtitle and two buttons: "Begin session" (goes to slides) and "Scenario experience" (goes directly to game).
+- A brief session overview section (3–4 bullet points about what participants will do).
+- Institution logo at the bottom of the hero if I supply one.
+
+### 2. Teaching Slides
+- A 10–14 slide deck rendered from a JavaScript data array.
+- Prev / Next navigation with a progress bar.
+- Slides cover: the problem my scenario addresses, the SPARC framework (S/P/A/R/C), how my specific context maps to each stage, the scenario instructions, design principles, and a closing slide.
+- Slide 17 (or equivalent) has an in-slide design worksheet with six textarea fields (IDs: \`sd_context\`, \`sd_scenario\`, \`sd_decision\`, \`sd_constraints\`, \`sd_reflect\`, \`sd_curriculum\`). Save each to \`localStorage\` on input. Restore them when the slide is rendered.
+
+### 3. Scenario Experience
+Three phases rendered into a single container by JavaScript:
+
+**Setup phase**
+- A hero image at the top (\`./hero.png\` — I will supply this; use \`onerror="this.style.display='none'"\` as fallback).
+- A context card showing location/environment, time pressure, and duration.
+- A "How it works" numbered list (4 steps explaining the game).
+- Form fields: team name (auto-generated if blank), team members (optional), mission value (dropdown with 6 options relevant to my context).
+- "Begin" button.
+
+**Playing phase**
+- Resource bar showing three resources relevant to my context. All start at 20, minimum 0, maximum 30.
+  - Choose three resources appropriate to my context (e.g. Time, Safety, Energy — or adapt to suit).
+  - Colour code: green above 10, amber 6–10, red 5 and below.
+- Progress dots (one per scenario, filled as completed).
+- Scenario card: title, narrative paragraph.
+- Four choice cards (A–D): option letter + option text only. No score indicators shown during play.
+- After selection: fade in a consequence panel and a reflection prompt. Show a Next / Finish button.
+- Floating score-change indicators: when a resource changes, show a "+N" or "−N" animation floating above the relevant bar, then disappear.
+
+**Debrief phase**
+- Outcome banner: calculate Excellent (all resources ≥ 15), Viable (all ≥ 8), Fragile (any between 3–7), or At Risk (any ≤ 2). Show a title and description for each.
+- Animated final score gauges for each resource.
+- Choices accordion: expandable list of all 10 choices showing the option text, revealed effect pills (Time/Safety/Energy values colour-coded), and a "Best choice ★" green badge or a "Suggested best → Option X: [explanation]" callout for each scenario.
+- Debrief questions: 7 structured reflection questions.
+- Action buttons: Download debrief (.txt), Print summary, Reset mission.
+- Confetti canvas animation for Excellent outcome.
+
+### 4. About
+- Presenter name, role, institution.
+- Email address with Copy button.
+- Short biography.
+- A section about the research unit or department.
+
+## Scenario game data
+
+Generate exactly ten (10) scenarios based on my context above. Each scenario must:
+- Present a genuine dilemma where no option is obviously correct.
+- Offer four options (A–D) with meaningfully different trade-off profiles across the three resources.
+- Have a \`bestOption\` (the most professionally defensible choice) and a \`bestExplanation\` (2–3 sentences explaining why — written for a debrief audience, not as a judgment).
+- Include a consequence for each option (1–2 sentences, cause-and-effect, no moralising).
+- Include a reflection question that connects to theory, professional practice, or the learning outcomes.
+- Use real language from my discipline or context — not generic placeholder text.
+
+Format each scenario exactly as follows (JavaScript object literal):
+
+\`\`\`javascript
+{
+  title: "Scenario Title",
+  bestOption: "B",
+  bestExplanation: "Two or three sentences explaining why this option is most defensible...",
+  narrative: "One or two sentences setting the scene and presenting the dilemma...",
+  options: [
+    { label:"A", text:"What option A involves.", effect:{res1:+2, res2:-1, res3:0}, consequence:"What happens as a result." },
+    { label:"B", text:"What option B involves.", effect:{res1:-1, res2:+3, res3:+1}, consequence:"What happens as a result." },
+    { label:"C", text:"What option C involves.", effect:{res1:+1, res2:-2, res3:-1}, consequence:"What happens as a result." },
+    { label:"D", text:"What option D involves.", effect:{res1:+3, res2:-4, res3:-2}, consequence:"What happens as a result." }
+  ],
+  reflection: "A question that connects the decision to theory or professional practice?"
+}
+\`\`\`
+
+Replace \`res1\`, \`res2\`, \`res3\` with your chosen resource names (e.g. \`time\`, \`safety\`, \`energy\`). Effects should range from −5 to +4. Avoid making one option obviously best from the numbers alone.
+
+## Technical specifications
+
+- Use \`const SCENARIOS = [...]\` for the scenario data array.
+- Use \`const SLIDE_DATA = [...]\` for the slide data array (each slide has \`section\`, \`title\`, \`body\` as an HTML string, and optional \`cta\`).
+- Use a single \`let APP = {...}\` state object. Persist with \`localStorage.setItem('sparc_app', JSON.stringify(APP))\`.
+- All navigation via a \`navigate(page)\` function that shows/hides page divs using an \`active\` CSS class.
+- Floating score animations: use absolutely-positioned divs with a CSS keyframe (\`floatScore\`) that moves up and fades out.
+- Resource bars: animate width changes with \`transition: width .45s ease\`.
+- Notes panel: a fixed right-side panel (toggle with a button), \`localStorage\` auto-save, download button for notes as a \`.txt\` file.
+- Download debrief: use \`Blob\` + \`URL.createObjectURL\` to download a formatted text summary.
+- All image paths relative (\`./filename.ext\`) for GitHub Pages compatibility.
+- Include a \`confirmReset()\` function that shows a browser confirm dialog before clearing game state.
+
+## What to generate, in order
+
+1. All ten scenarios (as JavaScript objects, formatted as above) — generate these first so they inform the slide content.
+2. The full \`index.html\` file from \`<!DOCTYPE html>\` to \`</html>\`, in one continuous output.
+3. Do not stop mid-file or ask for confirmation — complete the entire file.
+4. After the file, provide a short list of any image assets I need to supply (names and recommended dimensions).
+
+## Notes for the build
+
+- The tone throughout should match my discipline and context — use appropriate vocabulary.
+- Avoid generic corporate language. Write as if a subject expert designed the activity.
+- The scenario consequences should feel authentic, not like a quiz marking scheme.
+- The reflection questions should be genuinely thought-provoking — the kind a good seminar tutor would ask.
+- The debrief should help participants see patterns in their decision-making, not just tell them if they won.
+`;
+
+  const blob = new Blob([md], {type:'text/markdown;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'my-sparc-build-prompt.md';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  showToast('SPARC prompt downloaded');
+}
+
+function copySparc() {
+  const text = `THE SPARC FRAMEWORK\n\nS — Scenario Learning\nStudents engage with realistic situations that mirror the complexity, ambiguity, and pressure of practice.\n\nP — Partnership\nPartnerships provide the reality: the pressures, constraints, and consequences that make learning authentic.\n\nA — Application\nApplication means students use ideas, not just recall them. They decide, negotiate, and justify.\n\nR — Reflection\nReflection turns activity into learning. Structured reflection makes consequences visible and meaningful.\n\nC — Curriculum\nCurriculum turns one good activity into a coherent teaching design with clear outcomes and assessment.\n\nSPARC Framework — Dr Jonathan Rhodes, University of Plymouth`;
+  navigator.clipboard.writeText(text).then(() => showToast('SPARC summary copied'));
+}
+
+function copyEmail() {
+  navigator.clipboard.writeText('jonathan.rhodes@plymouth.ac.uk').then(() => showToast('Email address copied'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PARTICLES
+═══════════════════════════════════════════════════════════ */
+function initParticles() {
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let pts = [];
+
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  resize();
+  addEventListener('resize', resize);
+
+  for (let i = 0; i < 75; i++) {
+    pts.push({ x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+      r: Math.random()*1.4+.4, vy: Math.random()*.25+.08,
+      vx: (Math.random()-.5)*.15, o: Math.random()*.45+.08 });
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pts.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(91,196,240,${p.o})`; ctx.fill();
+      p.y += p.vy; p.x += p.vx;
+      if (p.y > canvas.height+4) { p.y = -4; p.x = Math.random()*canvas.width; }
+      if (p.x < -4) p.x = canvas.width+4;
+      if (p.x > canvas.width+4) p.x = -4;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════════════════════════ */
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = innerWidth; canvas.height = innerHeight;
+  const cols = ['#5bc4f0','#3dba7a','#e8a530','#e4eff8','#82d6f8'];
+  const pts = Array.from({length:100}, () => ({
+    x: Math.random()*canvas.width, y: -12,
+    w: Math.random()*9+4, h: Math.random()*4+2,
+    rot: Math.random()*360, rs: (Math.random()-.5)*7,
+    vy: Math.random()*3.5+2, vx: (Math.random()-.5)*2,
+    col: cols[Math.floor(Math.random()*cols.length)]
+  }));
+  const t0 = Date.now();
+  function draw() {
+    const el = Date.now()-t0;
+    if (el > 4000) { ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pts.forEach(p => {
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.globalAlpha = Math.max(0, 1-el/3500);
+      ctx.fillStyle = p.col; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+      p.y += p.vy; p.x += p.vx; p.rot += p.rs;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadApp();
+  initParticles();
+  renderSlide(APP.slideIndex, 0);
+  if (APP.page && APP.page !== 'home') navigate(APP.page);
+  else navigate('home');
+  setTimeout(loadImages, 100);
+});
+</script>
+</body>
+</html>
