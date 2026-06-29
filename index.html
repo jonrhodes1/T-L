@@ -428,19 +428,37 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .hero-a-wrap{position:relative;display:inline-block}
 .hero-a-canvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:10}
 #hero-a{display:inline-block;transform-origin:center bottom}
-#hero-a.a-live{animation:aSparkPulse 3.2s cubic-bezier(.4,0,.2,1) forwards}
+#hero-a.a-live{animation:aSparkPulse 15s ease forwards}
 @keyframes aSparkPulse{
-  0%  {text-shadow:0 0 70px rgba(229,81,0,.3);transform:scale(1) rotate(0deg)}
-  6%  {text-shadow:0 0 4px #fff,0 0 18px #fff,0 0 55px #E55100,0 0 90px #E55100;transform:scale(1.05)}
-  10% {text-shadow:0 0 2px rgba(255,255,255,.4);transform:scale(.96)}
-  16% {text-shadow:0 0 6px #fff,0 0 35px #E55100,0 0 80px #E55100;transform:scale(1.07)}
-  22% {text-shadow:0 0 3px rgba(229,81,0,.3);transform:scale(.98)}
-  32% {text-shadow:0 0 8px #fff,0 0 50px #E55100,0 0 110px rgba(229,81,0,.5);transform:scale(1.1) rotate(-4deg)}
-  42% {text-shadow:0 0 6px #fff,0 0 40px #E55100,0 0 90px rgba(229,81,0,.4);transform:scale(1.12) rotate(4deg)}
-  54% {text-shadow:0 0 10px #fff,0 0 60px #E55100,0 0 130px rgba(229,81,0,.6);transform:scale(1.15) rotate(0deg)}
-  68% {text-shadow:0 0 6px rgba(255,160,60,.8),0 0 45px #E55100,0 0 100px rgba(229,81,0,.45);transform:scale(1.1)}
-  82% {text-shadow:0 0 4px rgba(255,160,60,.5),0 0 30px rgba(229,81,0,.6),0 0 70px rgba(229,81,0,.3);transform:scale(1.05)}
-  100%{text-shadow:0 0 30px rgba(229,81,0,.45),0 0 60px rgba(229,81,0,.2);transform:scale(1) rotate(0deg)}
+  /* 0-3s: ignition spark */
+  0%  {opacity:1;text-shadow:0 0 70px rgba(229,81,0,.3);transform:scale(1) translateY(0) rotate(0deg)}
+  4%  {text-shadow:0 0 4px #fff,0 0 18px #fff,0 0 55px #E55100,0 0 90px #E55100;transform:scale(1.06)}
+  7%  {text-shadow:0 0 2px rgba(255,255,255,.3);transform:scale(.96)}
+  11% {text-shadow:0 0 6px #fff,0 0 38px #E55100,0 0 85px #E55100;transform:scale(1.08)}
+  15% {text-shadow:0 0 3px rgba(229,81,0,.25);transform:scale(.97)}
+  20% {text-shadow:0 0 10px #fff,0 0 55px #E55100,0 0 120px rgba(229,81,0,.55);transform:scale(1.12) rotate(-3deg)}
+  /* 3-6s: breathe */
+  27% {text-shadow:0 0 18px rgba(229,81,0,.5),0 0 48px rgba(229,81,0,.25);transform:scale(1.05) rotate(0deg) translateY(0)}
+  32% {text-shadow:0 0 8px rgba(229,81,0,.28),0 0 28px rgba(229,81,0,.14);transform:scale(0.96) translateY(0)}
+  37% {text-shadow:0 0 20px rgba(229,81,0,.54),0 0 52px rgba(229,81,0,.27);transform:scale(1.06) translateY(0)}
+  42% {text-shadow:0 0 10px rgba(229,81,0,.3),0 0 32px rgba(229,81,0,.16);transform:scale(0.97) translateY(0)}
+  /* 6-9s: float */
+  47% {text-shadow:0 0 16px rgba(229,81,0,.44),0 0 42px rgba(229,81,0,.22);transform:scale(1.03) translateY(-12px)}
+  52% {text-shadow:0 0 12px rgba(229,81,0,.36),0 0 34px rgba(229,81,0,.18);transform:scale(1.01) translateY(4px)}
+  57% {text-shadow:0 0 18px rgba(229,81,0,.48),0 0 46px rgba(229,81,0,.23);transform:scale(1.04) translateY(-9px)}
+  61% {text-shadow:0 0 14px rgba(229,81,0,.4),0 0 38px rgba(229,81,0,.2);transform:scale(1.02) translateY(2px)}
+  /* 9-11s: vanish */
+  64% {opacity:1;text-shadow:0 0 16px rgba(229,81,0,.42);transform:scale(1.03) translateY(0)}
+  70% {opacity:0;text-shadow:0 0 0px rgba(229,81,0,0);transform:scale(1.18) translateY(-6px)}
+  76% {opacity:0;transform:scale(0.88) translateY(0)}
+  /* 11-13s: reappear flash */
+  80% {opacity:1;text-shadow:0 0 8px #fff,0 0 44px #E55100,0 0 110px rgba(229,81,0,.55);transform:scale(1.14)}
+  83% {opacity:0.4;text-shadow:0 0 2px rgba(229,81,0,.2);transform:scale(0.94)}
+  86% {opacity:1;text-shadow:0 0 6px #fff,0 0 52px #E55100,0 0 120px rgba(229,81,0,.58);transform:scale(1.11)}
+  /* 13-15s: final settle */
+  91% {text-shadow:0 0 10px #fff,0 0 62px #E55100,0 0 135px rgba(229,81,0,.6);transform:scale(1.14)}
+  96% {text-shadow:0 0 22px rgba(229,81,0,.65),0 0 65px rgba(229,81,0,.38);transform:scale(1.04)}
+  100%{text-shadow:0 0 28px rgba(229,81,0,.42),0 0 55px rgba(229,81,0,.18);transform:scale(1) translateY(0) rotate(0deg)}
 }
 </style>
 </head>
@@ -1974,19 +1992,22 @@ function initSparkA() {
     else { ctx.clearRect(0, 0, W, H); running = false; }
   }
 
-  // Phase 1: big spark burst at 1.3s
-  setTimeout(() => {
-    aEl.classList.add('a-live');
-    burst(38, 1);
-    running = true;
-    tick();
-  }, 1300);
+  function fire(n, phase) { burst(n, phase); if (!running) { running = true; tick(); } }
 
-  // Phase 2: secondary micro-sparks at 1.9s
-  setTimeout(() => { burst(22, 2); if (!running) { running = true; tick(); } }, 1900);
-
-  // Phase 3: final ember scatter at 2.5s
-  setTimeout(() => { burst(14, 2); if (!running) { running = true; tick(); } }, 2500);
+  // 1.3s — ignition
+  setTimeout(() => { aEl.classList.add('a-live'); fire(40, 1); }, 1300);
+  // 1.9s — secondary sparks
+  setTimeout(() => fire(22, 2), 1900);
+  // 2.5s — ember scatter
+  setTimeout(() => fire(14, 2), 2500);
+  // 12s — reappear flash burst
+  setTimeout(() => fire(36, 1), 12000);
+  // 12.6s — aftershock
+  setTimeout(() => fire(20, 2), 12600);
+  // 13.2s — final ember
+  setTimeout(() => fire(14, 2), 13200);
+  // 15.5s — all done, clear canvas
+  setTimeout(() => { running = false; ctx.clearRect(0, 0, W, H); }, 15500);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
