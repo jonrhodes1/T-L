@@ -424,6 +424,24 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   body{background:white;color:#111}
   .page{padding-top:0}
 }
+/* ── SPARK-A ── */
+.hero-a-wrap{position:relative;display:inline-block}
+.hero-a-canvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:10}
+#hero-a{display:inline-block;transform-origin:center bottom}
+#hero-a.a-live{animation:aSparkPulse 3.2s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes aSparkPulse{
+  0%  {text-shadow:0 0 70px rgba(229,81,0,.3);transform:scale(1) rotate(0deg)}
+  6%  {text-shadow:0 0 4px #fff,0 0 18px #fff,0 0 55px #E55100,0 0 90px #E55100;transform:scale(1.05)}
+  10% {text-shadow:0 0 2px rgba(255,255,255,.4);transform:scale(.96)}
+  16% {text-shadow:0 0 6px #fff,0 0 35px #E55100,0 0 80px #E55100;transform:scale(1.07)}
+  22% {text-shadow:0 0 3px rgba(229,81,0,.3);transform:scale(.98)}
+  32% {text-shadow:0 0 8px #fff,0 0 50px #E55100,0 0 110px rgba(229,81,0,.5);transform:scale(1.1) rotate(-4deg)}
+  42% {text-shadow:0 0 6px #fff,0 0 40px #E55100,0 0 90px rgba(229,81,0,.4);transform:scale(1.12) rotate(4deg)}
+  54% {text-shadow:0 0 10px #fff,0 0 60px #E55100,0 0 130px rgba(229,81,0,.6);transform:scale(1.15) rotate(0deg)}
+  68% {text-shadow:0 0 6px rgba(255,160,60,.8),0 0 45px #E55100,0 0 100px rgba(229,81,0,.45);transform:scale(1.1)}
+  82% {text-shadow:0 0 4px rgba(255,160,60,.5),0 0 30px rgba(229,81,0,.6),0 0 70px rgba(229,81,0,.3);transform:scale(1.05)}
+  100%{text-shadow:0 0 30px rgba(229,81,0,.45),0 0 60px rgba(229,81,0,.2);transform:scale(1) rotate(0deg)}
+}
 </style>
 </head>
 <body>
@@ -482,7 +500,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="hero-sparc" aria-label="SPARC">
         <span class="hero-letter">S</span>
         <span class="hero-letter">P</span>
-        <span class="hero-letter">A</span>
+        <span class="hero-letter hero-a-wrap"><span id="hero-a">A</span><canvas class="hero-a-canvas" id="sparkCanvas"></canvas></span>
         <span class="hero-letter">R</span>
         <span class="hero-letter">C</span>
       </div>
@@ -1900,6 +1918,77 @@ function launchConfetti() {
 /* ═══════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════ */
+function initSparkA() {
+  const aEl = document.getElementById('hero-a');
+  const canvas = document.getElementById('sparkCanvas');
+  if (!aEl || !canvas) return;
+  const R = aEl.getBoundingClientRect();
+  const W = R.width * 5, H = R.height * 5;
+  canvas.width = W; canvas.height = H;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  const cx = W / 2, cy = H / 2;
+  let particles = [];
+  const COLORS = ['#fff','#FFD580','#E55100','#FFAA40','#fff','#FFA020'];
+
+  function burst(n, phase) {
+    for (let i = 0; i < n; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const spd = phase === 1 ? (2 + Math.random() * 6) : (1 + Math.random() * 4);
+      const len = phase === 1 ? (8 + Math.random() * 18) : (4 + Math.random() * 12);
+      particles.push({
+        x: cx + (Math.random() - .5) * R.width * .6,
+        y: cy + (Math.random() - .5) * R.height * .4,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd,
+        life: 1, decay: .022 + Math.random() * .028,
+        len, col: COLORS[Math.floor(Math.random() * COLORS.length)],
+        w: phase === 1 ? (1.5 + Math.random() * 2) : (1 + Math.random())
+      });
+    }
+  }
+
+  let running = true;
+  function tick() {
+    if (!running) return;
+    ctx.clearRect(0, 0, W, H);
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life) * Math.max(0, p.life);
+      ctx.strokeStyle = p.col;
+      ctx.lineWidth = p.w;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = p.col;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x - p.vx * p.len / 6, p.y - p.vy * p.len / 6);
+      ctx.stroke();
+      ctx.restore();
+      p.x += p.vx; p.y += p.vy;
+      p.vy += .08;
+      p.life -= p.decay;
+    });
+    if (particles.length > 0) requestAnimationFrame(tick);
+    else { ctx.clearRect(0, 0, W, H); running = false; }
+  }
+
+  // Phase 1: big spark burst at 1.3s
+  setTimeout(() => {
+    aEl.classList.add('a-live');
+    burst(38, 1);
+    running = true;
+    tick();
+  }, 1300);
+
+  // Phase 2: secondary micro-sparks at 1.9s
+  setTimeout(() => { burst(22, 2); if (!running) { running = true; tick(); } }, 1900);
+
+  // Phase 3: final ember scatter at 2.5s
+  setTimeout(() => { burst(14, 2); if (!running) { running = true; tick(); } }, 2500);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Force light mode always
   document.documentElement.dataset.theme = 'light';
@@ -1910,6 +1999,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (APP.page && APP.page !== 'home') navigate(APP.page);
   else navigate('home');
   setTimeout(loadImages, 100);
+  setTimeout(initSparkA, 400);
 });
 </script>
 </body>
