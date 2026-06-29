@@ -31,9 +31,56 @@
   --r-sm:       8px;
   --font: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
+/* ── LIGHT THEME ── */
+[data-theme="light"]{
+  --bg:        #F5F2EC;
+  --bg-surface:#FFFFFF;
+  --bg-raised: #EAE5DC;
+  --bg-hover:  #E0D9CE;
+  --border:    rgba(0,0,0,0.09);
+  --border-lt: rgba(0,0,0,0.15);
+  --border-br: rgba(229,81,0,0.5);
+  --text:      #111111;
+  --text-sub:  #3A3A3A;
+  --text-muted:#888888;
+  --text-dim:  #BBBBBB;
+  --ice:       #E55100;
+  --ice-br:    #F4622A;
+  --ice-dim:   rgba(229,81,0,0.14);
+  --amber:     #C07000;
+  --amber-dim: rgba(192,112,0,0.14);
+  --green:     #1E8C52;
+  --green-dim: rgba(30,140,82,0.12);
+  --danger:    #CC2929;
+  --danger-dim:rgba(204,41,41,0.12);
+}
+[data-theme="light"] body{background:var(--bg);color:var(--text)}
+[data-theme="light"] #nav{background:rgba(245,242,236,0.96);border-bottom-color:rgba(0,0,0,0.08)}
+[data-theme="light"] #particleCanvas{opacity:.08}
+[data-theme="light"] .plym-logo{filter:invert(1) brightness(0)}
+[data-theme="light"] .hero-letter{text-shadow:0 0 50px rgba(229,81,0,0.22)}
+[data-theme="light"] .btn-primary{color:#fff}
+[data-theme="light"] .blockquote{background:rgba(229,81,0,0.04);border-left-color:var(--ice)}
+[data-theme="light"] .card,.slide-card,[data-theme="light"] .setup-box .card{background:#fff}
+[data-theme="light"] #mobileMenu{background:#fff}
+[data-theme="light"] #notesPanel{background:#fff}
+[data-theme="light"] ::-webkit-scrollbar-track{background:var(--bg)}
+[data-theme="light"] ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15)}
+[data-theme="light"] .slide-card{background:#fff;border-color:rgba(0,0,0,0.07)}
+[data-theme="light"] .scene-wrap .card,[data-theme="light"] .choices-accordion{background:#fff}
+[data-theme="light"] .depth-card,[data-theme="light"] .how-it-works{background:#fff}
+[data-theme="light"] .basmu-note{background:rgba(229,81,0,0.04)}
+[data-theme="light"] .outcome-banner.excellent{background:linear-gradient(135deg,#1a5e3a,#1E8C52)}
+[data-theme="light"] .outcome-banner.viable{background:linear-gradient(135deg,#1a4060,#2a6090)}
+[data-theme="light"] .outcome-banner.fragile{background:linear-gradient(135deg,#5a4000,#8a6200)}
+[data-theme="light"] .outcome-banner.serious{background:linear-gradient(135deg,#6a1010,#9a2020)}
+/* theme toggle button */
+.theme-toggle{background:none;border:1px solid var(--border-lt);border-radius:20px;padding:.28rem .65rem;font-size:.85rem;color:var(--text-sub);cursor:pointer;flex-shrink:0;transition:all .2s;line-height:1}
+.theme-toggle:hover{border-color:var(--ice);color:var(--ice)}
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6;transition:background .3s,color .3s}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border-lt);border-radius:3px}
@@ -64,7 +111,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .page.active{display:block;animation:pageIn .38s ease both}
 @keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .container{max-width:1080px;margin:0 auto;padding:0 1.75rem}
-.section{padding:2.8rem 0}
+.section{padding:1.8rem 0}
 
 /* ── TYPOGRAPHY ── */
 .section-title{font-size:1.55rem;font-weight:800;letter-spacing:-.015em;margin-bottom:.4rem}
@@ -104,7 +151,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 @keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
 
 /* ── HOME HERO ── */
-.hero{padding:4.5rem 0 3.5rem;text-align:center}
+.hero{padding:3rem 0 2rem;text-align:center}
 .hero-sparc{display:flex;justify-content:center;gap:.12em;margin-bottom:1.2rem}
 .hero-letter{font-size:clamp(3.5rem,9vw,7.5rem);font-weight:900;color:var(--ice);text-shadow:0 0 70px rgba(91,196,240,.38);opacity:0;animation:letterIn .6s cubic-bezier(.2,.8,.3,1) both}
 .hero-letter:nth-child(1){animation-delay:.08s}
@@ -340,7 +387,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .looks-cold-img{width:100%;max-height:280px;object-fit:cover;border-radius:12px;display:block;opacity:0}
 .slide-img{width:100%;max-height:240px;object-fit:cover;border-radius:10px;margin:1rem 0;display:block;opacity:0}
 .profile-img{width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid var(--ice-dim);flex-shrink:0;opacity:0}
-.plym-logo{height:36px;object-fit:contain;filter:brightness(1.1);opacity:0}
+.plym-logo{height:64px;object-fit:contain;filter:brightness(1.1);opacity:0}
 
 /* ── NOTES PANEL ── */
 #notesPanel{position:fixed;top:0;right:0;width:320px;max-width:90vw;height:100vh;background:var(--bg-surface);border-left:1px solid var(--border-lt);z-index:900;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease}
@@ -400,6 +447,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <button class="nav-btn" data-page="scenario" onclick="navigate('scenario')">Scenario Experience</button>
     <button class="nav-btn" data-page="contact" onclick="navigate('contact')">Contact / Impact</button>
   </div>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle light / dark">☀</button>
   <button class="nav-btn" onclick="toggleNotesPanel()" style="flex-shrink:0;border-color:var(--border-lt)">Notes</button>
   <button class="nav-burger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -449,7 +497,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <button class="btn btn-primary" onclick="navigate('teaching')">Begin Session ›</button>
         <button class="btn btn-secondary" onclick="navigate('scenario')">Scenario Experience</button>
       </div>
-      <div style="margin-top:2rem;opacity:0;animation:fadeUp .6s ease 1.3s both">
+      <div style="margin-top:1.25rem;opacity:0;animation:fadeUp .6s ease 1.1s both">
         <img src="./plymouth-logo-white.png" alt="University of Plymouth" class="plym-logo">
       </div>
     </div>
@@ -522,41 +570,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
 
-    <!-- Image uploads -->
-    <div class="section" style="padding-top:0">
-      <div class="label-chip">Session images</div>
-      <h2 class="section-title">Add session images</h2>
-      <p class="section-lead">Upload images to display during the session. They are saved locally in your browser and will persist until you clear your browser data.</p>
-      <div class="card-grid">
-        <div class="img-card">
-          <div class="img-type-label">Field research / partnership</div>
-          <div class="img-preview" id="imgPreview_0">
-            <img src="./IMG_7295.jpg" alt="Field research and partnership" class="asset-img delay-1">
-          </div>
-          <input type="file" accept="image/*" id="imgInput_0" style="display:none" onchange="handleImg(0,this)">
-          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:.5rem" onclick="document.getElementById('imgInput_0').click()">Replace image</button>
-          <input class="img-caption" type="text" placeholder="Add a caption…" id="imgCaption_0" oninput="saveCaption(0,this.value)">
-        </div>
-        <div class="img-card">
-          <div class="img-type-label">Scenario learning / classroom</div>
-          <div class="img-preview" id="imgPreview_1">
-            <img src="./MOCAP.png" alt="Scenario learning in practice" class="asset-img delay-2">
-          </div>
-          <input type="file" accept="image/*" id="imgInput_1" style="display:none" onchange="handleImg(1,this)">
-          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:.5rem" onclick="document.getElementById('imgInput_1').click()">Replace image</button>
-          <input class="img-caption" type="text" placeholder="Add a caption…" id="imgCaption_1" oninput="saveCaption(1,this.value)">
-        </div>
-        <div class="img-card">
-          <div class="img-type-label">Reflection / curriculum</div>
-          <div class="img-preview" id="imgPreview_2">
-            <img src="./John_Diego.jpg" alt="Reflection and curriculum design" class="asset-img delay-3">
-          </div>
-          <input type="file" accept="image/*" id="imgInput_2" style="display:none" onchange="handleImg(2,this)">
-          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:.5rem" onclick="document.getElementById('imgInput_2').click()">Replace image</button>
-          <input class="img-caption" type="text" placeholder="Add a caption…" id="imgCaption_2" oninput="saveCaption(2,this.value)">
-        </div>
-      </div>
-    </div>
 
   </div><!-- /container -->
 </div><!-- /page-home -->
@@ -866,7 +879,8 @@ const SLIDE_DATA = [
 
   // 6
   { section:"P: Partnership", title:"P — Partnership",
-    body:`<div class="slide-quote">Partnerships provide the reality. They reveal the pressures, constraints, language, and consequences that make a learning activity authentic.</div>
+    body:`<img src="./IMG_7295.jpg" alt="Field research and partnership" class="slide-img" style="max-height:180px">
+    <div class="slide-quote">Partnerships provide the reality. They reveal the pressures, constraints, language, and consequences that make a learning activity authentic.</div>
     <ul class="slide-list">
     <li>Informed by applied work with the British Antarctic Survey Medical Unit</li>
     <li>Defence and security contexts</li>
@@ -879,7 +893,8 @@ const SLIDE_DATA = [
 
   // 7
   { section:"A: Application", title:"A — Application",
-    body:`<div class="slide-quote">Application means students use ideas, not just recall them.</div>
+    body:`<img src="./MOCAP.png" alt="Scenario learning in practice" class="slide-img" style="max-height:180px">
+    <div class="slide-quote">Application means students use ideas, not just recall them.</div>
     <ul class="slide-list">
     <li>Make a decision with incomplete information</li>
     <li>Interpret ambiguous data under time pressure</li>
@@ -893,7 +908,8 @@ const SLIDE_DATA = [
 
   // 8
   { section:"R + C", title:"R + C — Reflection into Curriculum",
-    body:`<p>Reflection turns activity into learning. Curriculum turns one good activity into a coherent teaching design.</p>
+    body:`<img src="./John_Diego.jpg" alt="Reflection and curriculum design" class="slide-img" style="max-height:180px">
+    <p>Reflection turns activity into learning. Curriculum turns one good activity into a coherent teaching design.</p>
     <div class="slide-rc-grid">
     <div>
     <h4>Reflection prompts</h4>
@@ -1803,6 +1819,15 @@ function copySparc() {
   navigator.clipboard.writeText(text).then(() => showToast('SPARC summary copied'));
 }
 
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.dataset.theme === 'light';
+  html.dataset.theme = isLight ? '' : 'light';
+  document.getElementById('themeToggle').textContent = isLight ? '☀' : '☾';
+  try { localStorage.setItem('sparc_theme', html.dataset.theme); } catch(e) {}
+  initParticles();
+}
+
 function copyEmail() {
   navigator.clipboard.writeText('jonathan.rhodes@plymouth.ac.uk').then(() => showToast('Email address copied'));
 }
@@ -1817,9 +1842,12 @@ function showToast(msg) {
 /* ═══════════════════════════════════════════════════════════
    PARTICLES
 ═══════════════════════════════════════════════════════════ */
+let _particleRAF = null;
 function initParticles() {
+  if (_particleRAF) cancelAnimationFrame(_particleRAF);
   const canvas = document.getElementById('particleCanvas');
   const ctx = canvas.getContext('2d');
+  const isLight = () => document.documentElement.dataset.theme === 'light';
   let pts = [];
 
   function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
@@ -1834,15 +1862,16 @@ function initParticles() {
 
   function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    const col = isLight() ? `160,100,60` : `91,196,240`;
     pts.forEach(p => {
       ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle = `rgba(91,196,240,${p.o})`; ctx.fill();
+      ctx.fillStyle = `rgba(${col},${p.o})`; ctx.fill();
       p.y += p.vy; p.x += p.vx;
       if (p.y > canvas.height+4) { p.y = -4; p.x = Math.random()*canvas.width; }
       if (p.x < -4) p.x = canvas.width+4;
       if (p.x > canvas.width+4) p.x = -4;
     });
-    requestAnimationFrame(draw);
+    _particleRAF = requestAnimationFrame(draw);
   }
   draw();
 }
@@ -1883,6 +1912,11 @@ function launchConfetti() {
    INIT
 ═══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
+  // Restore theme before first paint
+  const savedTheme = localStorage.getItem('sparc_theme') || '';
+  document.documentElement.dataset.theme = savedTheme;
+  if (savedTheme === 'light') document.getElementById('themeToggle').textContent = '☾';
+
   loadApp();
   initParticles();
   renderSlide(APP.slideIndex, 0);
